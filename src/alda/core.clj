@@ -310,6 +310,37 @@
                       (spaced x))
     :else           (-str x)))
 
+(defrecord Sexp [form]
+  Stringify
+  (-str [{:keys [form]}] (pr-str form)))
+
+(defmacro lisp-builtin
+  [sym]
+  `(defn ~sym
+     ~(format "Emits inline Lisp code (%s ...)" sym)
+     [& ~'args]
+     (map->Sexp {:form (list* '~sym ~'args)})))
+
+(defmacro lisp-builtins
+  [& syms]
+  (cons 'do
+        (for [sym syms]
+          `(lisp-builtin ~sym))))
+
+(defmacro lisp-builtin-attributes
+  [& syms]
+  (cons 'do
+        (for [sym syms]
+          `(lisp-builtins ~sym ~(symbol (str sym \!))))))
+
+(lisp-builtin-attributes
+  tempo metric-modulation octave quant quantize quantization vol volume
+  track-vol track-volume pan panning key-sig key-signature transpose
+  transposition tuning-constant reference-pitch)
+
+(lisp-builtins
+  set-duration set-note-length)
+
 (comment
   (stop!)
   (clear-history!)
@@ -382,10 +413,11 @@
       (note (pitch letter) (note-length 8))))
   (play!
     '(tempo! 250)
+    (part "piano")
     (for [pan-value (range 101)]
       [(list 'pan pan-value)
-       (note (pitch (rand-nth [:c :d :e :f :g :a :b])
-                    (note-length 16)))
+       (note (pitch (rand-nth [:c :d :e :f :g :a :b]))
+             (note-length 16))
        "\n"])))
 
 
