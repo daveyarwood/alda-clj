@@ -25,12 +25,11 @@
 (defprotocol Stringify
   (-str [this]))
 
-(defn ->str
-  [x]
-  (cond
-    (string? x)     x
-    (sequential? x) (str/join \space (map ->str x))
-    :else           (-str x)))
+;; When provided with a sequence of events, ->str intelligently injects spaces
+;; and newlines between them based on the types of the events. We have to
+;; declare ->str here because we need to define all the event types below before
+;; we can define ->str.
+(declare ->str)
 
 (defn play!
   [& xs]
@@ -272,8 +271,7 @@
 (defrecord SetVariable [name events]
   Stringify
   (-str [{:keys [name events]}]
-    (str (->str [name (->Equals) events])
-         \newline)))
+    (->str [name (->Equals) events])))
 
 (defn set-variable
   "Defines any number of events as a variable so that they can be referenced by
@@ -290,6 +288,25 @@
   "Returns any number of events previously defined as a variable."
   [var-name]
   (map->GetVariable {:name var-name}))
+
+(defn- spaced
+  [xs]
+  (->> (for [[e1 e2] (partition 2 1 (concat xs [:end]))]
+         (cond
+           (= :end e2)                   nil
+           (instance? InstrumentCall e1) \newline
+           (instance? SetVariable e1)    \newline
+           (instance? SetVariable e2)    \newline
+           :else                         \space))
+       (interleave (map ->str xs))
+       (apply str)))
+
+(defn ->str
+  [x]
+  (cond
+    (string? x)     x
+    (sequential? x) (spaced x)
+    :else           (-str x)))
 
 (comment
   (stop!)
@@ -340,6 +357,10 @@
                   (note (pitch :c))
                   (note (pitch :d))
                   (note (pitch :c)))
-    (get-variable "foo")))
+    (get-variable "foo")
+    (cram (note-length 4)
+      (for [letter [:c :d :e]]
+        (note (pitch letter))))
+    (note (pitch :f) (note-length 2 {:dots 1}))))
 
 
