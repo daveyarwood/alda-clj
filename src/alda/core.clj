@@ -112,6 +112,15 @@
   [number & [{:keys [dots]}]]
   (map->NoteLength {:number number :dots (or dots 0)}))
 
+(defrecord Milliseconds [number]
+  Stringify
+  (-str [{:keys [number]}]
+    (str number "ms")))
+
+(defn ms
+  [number]
+  (map->Milliseconds {:number number}))
+
 (defn duration
   [& components]
   (map->Duration {:components components}))
@@ -418,6 +427,10 @@
       [(list 'pan pan-value)
        (note (pitch (rand-nth [:c :d :e :f :g :a :b]))
              (note-length 16))
-       "\n"])))
+       "\n"]))
+  (play!
+    (part "piano")
+    (for [n (repeatedly 8 #(+ 100 (rand-int 1500)))]
+      (note (pitch letter) (ms n)))))
 
 
