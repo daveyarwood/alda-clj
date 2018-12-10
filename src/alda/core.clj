@@ -305,7 +305,9 @@
   [x]
   (cond
     (string? x)     x
-    (sequential? x) (spaced x)
+    (sequential? x) (if (symbol? (first x))
+                      (pr-str x)
+                      (spaced x))
     :else           (-str x)))
 
 (comment
@@ -361,6 +363,29 @@
     (cram (note-length 4)
       (for [letter [:c :d :e]]
         (note (pitch letter))))
-    (note (pitch :f) (note-length 2 {:dots 1}))))
+    (note (pitch :f) (note-length 2 {:dots 1})))
+  (play!
+    (part "piano")
+    (for [tempo (repeatedly 4 #(+ 60 (rand-int 200)))]
+      [(list 'tempo tempo)
+       (for [letter [:c :d :e :f :g]]
+         (note (pitch letter) (note-length 8)))]))
+  (play!
+    '(tempo! 150)
+    (part "piano")
+    '(pan 0)
+    (for [letter [:c :d :e :f :g :c :d :e :f :g]]
+      (note (pitch letter) (note-length 8)))
+    "\n"
+    '(pan 100)
+    (for [letter [:c :d :e :f :g :c :d :e :f :g]]
+      (note (pitch letter) (note-length 8))))
+  (play!
+    '(tempo! 250)
+    (for [pan-value (range 101)]
+      [(list 'pan pan-value)
+       (note (pitch (rand-nth [:c :d :e :f :g :a :b])
+                    (note-length 16)))
+       "\n"])))
 
 
