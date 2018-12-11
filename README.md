@@ -104,6 +104,10 @@ result to `alda`. alda-clj is one way to do this.
 Add the latest version in Clojars to your dependencies:
 
 ```clojure
+;; deps.edn
+io.djy/alda-clj {:mvn/version "X.X.X"}
+
+;; lein/boot
 [io.djy/alda-clj "X.X.X"]
 ```
 
