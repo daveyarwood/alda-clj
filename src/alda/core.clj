@@ -38,6 +38,10 @@
     (alter-var-root #'*alda-history* str code \newline)
     code))
 
+(defn stop!
+  []
+  (alda "stop"))
+
 (defrecord InstrumentCall [names nickname]
   Stringify
   (-str [{:keys [names nickname]}]
