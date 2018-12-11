@@ -2,7 +2,7 @@
 
 [![Clojars Project](https://img.shields.io/clojars/v/io.djy/alda-clj.svg)](https://clojars.org/io.djy/alda-clj)
 
-[![cljdoc badge](https://cljdoc.org/badge/io.djy/alda-clj)](https://cljdoc.org/d/io.djy/alda-clj/0.1.1)
+[![cljdoc badge](https://cljdoc.org/badge/io.djy/alda-clj)](https://cljdoc.org/d/io.djy/alda-clj/CURRENT)
 
 A Clojure library for live-coding music with [Alda](https://alda.io).
 
