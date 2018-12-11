@@ -1,8 +1,9 @@
-{:deps    {}
+{:paths   ["src"]
+ :deps    {}
  :aliases {:pack
            {:extra-deps {pack/pack.alpha
                          {:git/url "https://github.com/juxt/pack.alpha.git"
-                          :sha "24863d1ff5a54bb7cc783ff62272212b51c8b316"}}
+                          :sha "8acf80dd4d6e5173585f5c6fec7af28a310f3ed7"}}
             :main-opts  ["-m"]}
 
            :deploy
