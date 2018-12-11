@@ -1,5 +1,3 @@
 #!/bin/bash
 
-echo "Deploying to Clojars..."
-
 clojure -A:deploy
