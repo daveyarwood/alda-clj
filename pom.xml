@@ -25,7 +25,7 @@
   <scm>
     <connection>scm:git:git://github.com/daveyarwood/alda-clj.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/daveyarwood/alda-clj.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>master</tag>
     <url>https://github.com/daveyarwood/alda-clj</url>
   </scm>
 </project>
