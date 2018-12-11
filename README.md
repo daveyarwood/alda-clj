@@ -162,6 +162,14 @@ You can also stop playback if things get out of hand:
 (stop!)
 ```
 
+You can conveniently issue arbitrary commands to the Alda client from the
+comfort of your REPL:
+
+```clojure
+(println (alda "version"))
+(println (alda "status"))
+```
+
 ## Docs, examples
 
 For more details, see ... TODO ...
