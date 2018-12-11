@@ -1,0 +1,6 @@
+#!/bin/bash
+
+clj -A:pack \
+  mach.pack.alpha.skinny \
+  --no-libs \
+  --project-path alda-clj.jar

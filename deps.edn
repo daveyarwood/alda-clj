@@ -1,1 +1,11 @@
-{:deps {}}
+{:deps    {}
+ :aliases {:pack
+           {:extra-deps {pack/pack.alpha
+                         {:git/url "https://github.com/juxt/pack.alpha.git"
+                          :sha "24863d1ff5a54bb7cc783ff62272212b51c8b316"}}
+            :main-opts  ["-m"]}
+
+           :deploy
+           {:extra-deps {deps-deploy {:mvn/version "RELEASE"}}
+            :main-opts  ["-m" "deps-deploy.deps-deploy"
+                         "deploy" "alda-clj.jar"]}}}
