@@ -1,0 +1,39 @@
+#!/usr/bin/env clojure
+;; vim: ft=clojure
+
+(require '[alda.core :refer :all])
+
+(comment
+  "Clapping Music (1972)
+   for two performers
+
+   Steve Reich
+
+   sheet music:
+   https://sites.ualberta.ca/~michaelf/SEM-O/SEM-O_2014/Steve's%20piece/clapping_reich.jpg")
+
+(def pattern
+  (let [clap "o2 d+8"
+        rest (pause (duration (note-length 8)))]
+    [clap clap clap rest clap clap rest clap rest clap clap rest]))
+
+(defn shift [n pattern]
+  (take (count pattern) (drop n (cycle pattern))))
+
+(play!
+  (tempo! 172)
+
+  (part "midi-percussion")
+
+  (voice 1)
+  (repeat 13
+    (repeat 12 pattern))
+
+  (voice 2)
+  (for [n (range 13)]
+    (repeat 12 (shift n pattern))))
+
+(println "Press Ctrl-C to stop & exit.")
+
+(.addShutdownHook (Runtime/getRuntime)
+  (Thread. #(stop!)))
