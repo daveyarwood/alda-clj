@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Building alda-clj.jar..."
+
 rm -f alda-clj.jar
 
 clojure -A:pack \
