@@ -2,7 +2,7 @@
 
 rm -f alda-clj.jar
 
-clj -A:pack \
+clojure -A:pack \
   mach.pack.alpha.skinny \
   --no-libs \
   --project-path alda-clj.jar
