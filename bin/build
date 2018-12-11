@@ -1,5 +1,7 @@
 #!/bin/bash
 
+rm -f alda-clj.jar
+
 clj -A:pack \
   mach.pack.alpha.skinny \
   --no-libs \
