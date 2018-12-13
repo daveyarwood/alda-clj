@@ -347,10 +347,10 @@
           `(lisp-builtins ~sym ~(symbol (str sym \!))))))
 
 (lisp-builtin-attributes
-  tempo metric-modulation octave quant quantize quantization vol volume
-  track-vol track-volume pan panning key-sig key-signature transpose
-  transposition tuning-constant reference-pitch)
+  tempo metric-modulation quant quantize quantization vol volume track-vol
+  track-volume pan panning key-sig key-signature transpose transposition
+  tuning-constant reference-pitch)
 
 (lisp-builtins
-  set-duration set-note-length)
+  set-duration set-note-length octave!)
 
