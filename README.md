@@ -8,8 +8,8 @@ A Clojure library for live-coding music with [Alda](https://alda.io).
 
 ## Background and rationale
 
-See [history.md](doc/history.md) for a long-winded account of the path that led
-to alda-clj.
+See [History](https://cljdoc.org/d/io.djy/alda-clj/CURRENT/doc/readme/history)
+for a long-winded account of the path that led to alda-clj.
 
 ## How does it work?
 
