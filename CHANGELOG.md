@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.2 (2018-12-13)
+
+* Bugfix: `(octave :up)` generates `>`, not `(octave :up)`
+
 ## 0.1.1 (2018-12-11)
 
 No change; I had to bump the version while tinkering with deployment setup.
