@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3 (2018-12-21)
+
+No change; bumped version while tinkering with cljdoc.
+
 ## 0.1.2 (2018-12-13)
 
 * Bugfix: `(octave :up)` generates `>`, not `(octave :up)`
