@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.4 (2018-12-22)
+
+No change; bumped version to update documentation via cljdoc.
+
 ## 0.1.3 (2018-12-21)
 
 No change; bumped version while tinkering with cljdoc.

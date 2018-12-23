@@ -23,89 +23,58 @@ already been written (or generated). When you want to go higher-level and create
 scores programmatically, you can do so in an external process and pipe the
 result to `alda`. alda-clj is one way to do this.
 
+alda-clj is intended to be used in at least two ways:
+
+1. In an **improv / live-coding** setting, using a live Clojure REPL to generate
+   and play music on the fly.
+
+2. In a **music composition** setting, where the composition is a Clojure
+   program / script that uses alda-clj to generate a score.
+
 ## Usage
 
-Add the latest version in Clojars to your dependencies:
-
-```clojure
-;; deps.edn
-io.djy/alda-clj {:mvn/version "X.X.X"}
-
-;; lein/boot
-[io.djy/alda-clj "X.X.X"]
-```
-
-If you haven't already, [install
+1. If you haven't already, [install
 Alda](https://github.com/alda-lang/alda#installation) and make sure `alda` is
 available on your `PATH`.
 
-> alda-clj will shell out and use `alda` (wherever it's found on your `PATH`) to
-> play your scores. If desired, you can specify an alternate `alda` executable
-> by binding `alda.core/*alda-executable*` to something else, e.g.
-> `"/home/dave/Downloads/some-other-alda"`.
+  > alda-clj will shell out and use `alda` (wherever it's found on your `PATH`) to
+  > play your scores. If desired, you can specify an alternate `alda` executable
+  > by binding `alda.core/*alda-executable*` to something else, e.g.
+  > `"/home/dave/Downloads/some-other-alda"`.
 
-Require `alda.core` and you're off to the races!
 
-```clojure
-(require '[alda.core :refer :all])
+2. Add the latest release version of alda-clj to your dependencies:
 
-(play!
-  (part "piano")
-  (for [notes [[:c :e :g] [:c :f :a] [:c :e :g]]]
-    (apply chord (map #(note (pitch %)) notes))))
-```
+  ```clojure
+  ;; deps.edn
+  io.djy/alda-clj {:mvn/version "X.X.X"}
 
-Each time you successfully `play!` something, the generated Alda code is
-appended to `alda.core/*alda-history*`, a string of Alda code representing the
-score so far that is sent along for context on each call to the `alda` client.
-This is what allows scores to be played incrementally, e.g.:
+  ;; lein/boot
+  [io.djy/alda-clj "X.X.X"]
+  ```
 
-```clojure
-;; conjure a guitar
-(play! (part "guitar"))
+3. Require `alda.core` and you're off to the races!
 
-;; play a few notes on the guitar
-(play!
-  (note (pitch :e) (note-length 8))
-  (note (pitch :f :sharp))
-  (note (pitch :g)))
+  ```clojure
+  (require '[alda.core :refer :all])
 
-;; play a few notes, still on the guitar
-(play!
-  (notes (pitch :a))
-  (notes (pitch :b) (note-length 2)))
-```
+  (play!
+    (part "piano")
+    (for [notes [[:c :e :g] [:c :f :a] [:c :e :g]]]
+      (apply chord (map #(note (pitch %)) notes))))
+  ```
 
-Between invocations of `play!`, the Alda client "remembers" which instrument(s)
-were active and all of their properties (octave, volume, panning, etc.) so that
-the context is not lost.
+## Docs, examples, etc.
 
-The history can be cleared at will:
+[API documentation](https://cljdoc.org/d/io.djy/alda-clj/CURRENT/api/alda), a
+[Getting Started](https://cljdoc.org/d/io.djy/alda-clj/CURRENT/doc/getting-started) guide and
+more are available at cljdoc.
 
-```clojure
-(clear-history!)
-```
+There are also [example scripts](examples) in this repo that will give you a
+sense of what you can do with alda-clj.
 
-You can also stop playback if things get out of hand:
-
-```clojure
-(stop!)
-```
-
-You can conveniently issue arbitrary commands to the Alda client from the
-comfort of your REPL:
-
-```clojure
-(println (alda "version"))
-(println (alda "status"))
-```
-
-## Docs, examples
-
-[Detailed documentation is available at
-cljdoc](https://cljdoc.org/d/io.djy/alda-clj/CURRENT).
-
-There are also [example scripts](examples) in this repo.
+Ping `@dave` on [Slack](https://slack.alda.io) if you have any questions or if
+you just want to chat about alda-clj!
 
 ## License
 
