@@ -236,7 +236,7 @@ accept a string of Alda code in lieu of an event:
   (note (pitch :a))
   (note (pitch :b))
   "> c")
-;;=> "piano: o4 c/e/g a b > c"
+;;=> "piano: o4 c16/e/g a b > c"
 ```
 
 For convenience, `play!` will also flatten the sequence of its arguments. This
