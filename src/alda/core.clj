@@ -309,6 +309,7 @@
          (cond
            (= :end e2)                   nil
            (instance? InstrumentCall e1) \newline
+           (instance? InstrumentCall e2) \newline
            (instance? SetVariable e1)    \newline
            (instance? SetVariable e2)    \newline
            :else                         \space))
