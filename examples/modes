@@ -9,8 +9,8 @@
   (part "piano")
 
   (for [mode [:ionian :dorian :phrygian :lydian :mixolydian :aeolian :locrian]]
-   [(key-sig [:c mode])
-    "o4 c4 d8 e f g a b > c1"]))
+    [(key-sig [:c mode])
+     "o4 c4 d8 e f g a b > c1"]))
 
 (println "Press Ctrl-C to stop & exit.")
 
