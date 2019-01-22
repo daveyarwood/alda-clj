@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.6 (2019-01-21)
+
+No change; bumped version to make some tweaks to documentation.
+
 ## 0.1.5 (2019-01-21)
 
 * Bugfix: `cram` duration can be `nil` (i.e. the default duration) now.
