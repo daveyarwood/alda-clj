@@ -78,8 +78,8 @@
 (declare ->str)
 
 (defn play!
-  "Converts its arguments into a string of Alda code and sends it to the Alda
-   CLI to be parsed and played.
+  "Converts its arguments into a string of Alda code (via `->str`) and sends it
+   to the Alda CLI to be parsed and played.
 
    `*alda-history*` is sent along for context.
 
@@ -128,15 +128,15 @@
    ```clojure
    (part \"piano\")
    ;;=> #alda.core.InstrumentCall{:names [\"piano\"],
-                                  :nickname nil}
+   ;;=>                           :nickname nil}
 
    (part \"piano/trumpet\")
    ;;=> #alda.core.InstrumentCall{:names [\"piano\" \"trumpet\"],
-                                  :nickname nil}
+   ;;=>                           :nickname nil}
 
    (part {:names [\"piano\" \"trumpet\"] :nickname \"trumpiano\"})
    ;;=> #alda.core.InstrumentCall{:names [\"piano\" \"trumpet\"],
-                                  :nickname \"trumpiano\"}
+   ;;=>                           :nickname \"trumpiano\"}
 
    (->str (part {:names [\"piano\" \"trumpet\"] :nickname \"trumpiano\"}))
    ;;=> \"piano/trumpet \\\"trumpiano\\\":\"
@@ -672,7 +672,6 @@
   (-str [_] "V0:"))
 
 (defn end-voices
-  []
   "Ends the current voice group.
 
    Examples:
@@ -711,6 +710,7 @@
        (note (pitch :a))))
    ;;=> \"piano:\\nV1: o4 c8 d e f g a V2: o3 g4. d4. V0: o3 f1 > / c / a\"
    ```"
+  []
   (->EndVoices))
 
 (defrecord Cram [duration events]
@@ -729,11 +729,11 @@
 
    ```clojure
    (cram (note-length 2)
-         (note (pitch :e))
-         (note (pitch :f))
-         (note (pitch :e))
-         (note (pitch :f))
-         (note (pitch :e)))
+     (note (pitch :e))
+     (note (pitch :f))
+     (note (pitch :e))
+     (note (pitch :f))
+     (note (pitch :e)))
    ;;=> #alda.core.Cram{
    ;;=>   :duration #alda.core.NoteLength{:number 2, :dots 0},
    ;;=>   :events (#alda.core.Note{
@@ -768,11 +768,11 @@
    ;;=>              :slurred? nil})}
 
    (->str (cram (note-length 2)
-                (note (pitch :e))
-                (note (pitch :f))
-                (note (pitch :e))
-                (note (pitch :f))
-                (note (pitch :e))))
+            (note (pitch :e))
+            (note (pitch :f))
+            (note (pitch :e))
+            (note (pitch :f))
+            (note (pitch :e))))
    ;;=> \"{ e f e f e }2\"
 
    (play!
@@ -811,9 +811,9 @@
 
    ```clojure
    (set-variable \"riffA\"
-                 (note (pitch :d))
-                 (note (pitch :f))
-                 (note (pitch :a)))
+     (note (pitch :d))
+     (note (pitch :f))
+     (note (pitch :a)))
    ;;=> #alda.core.SetVariable{
    ;;=>   :name \"riffA\",
    ;;=>   :events (#alda.core.Note{
@@ -836,16 +836,16 @@
    ;;=>              :slurred? nil})}
 
    (->str (set-variable \"riffA\"
-                        (note (pitch :d))
-                        (note (pitch :f))
-                        (note (pitch :a))))
+            (note (pitch :d))
+            (note (pitch :f))
+            (note (pitch :a))))
    ;;=> \"riffA = d f a\"
 
    (play!
      (set-variable \"riffA\"
-                   (note (pitch :d))
-                   (note (pitch :f))
-                   (note (pitch :a)))
+       (note (pitch :d))
+       (note (pitch :f))
+       (note (pitch :a)))
 
      (part \"piano\")
      (get-variable \"riffA\"))
@@ -873,9 +873,9 @@
 
    (play!
      (set-variable \"riffA\"
-                   (note (pitch :d))
-                   (note (pitch :f))
-                   (note (pitch :a)))
+       (note (pitch :d))
+       (note (pitch :f))
+       (note (pitch :a)))
 
      (part \"piano\")
      (get-variable \"riffA\"))
