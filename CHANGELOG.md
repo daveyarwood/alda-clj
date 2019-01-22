@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.7 (2019-01-21)
+
+No change; bumped version to make more tweaks/fixes to the docs.
+
 ## 0.1.6 (2019-01-21)
 
 No change; bumped version to make some tweaks to documentation.
