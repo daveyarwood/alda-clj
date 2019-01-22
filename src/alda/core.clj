@@ -64,7 +64,7 @@
   "")
 
 (defn clear-history!
-  "Resets `*alda-history*` to \"\"."
+  "Resets `*alda-history*` to `\"\"`."
   []
   (alter-var-root #'*alda-history* (constantly "")))
 
@@ -116,7 +116,7 @@
 (defn part
   "Sets the current instrument instance(s) based on `instrument-call`.
 
-   `instrument-call` can either be a map containing :names and an optional
+   `instrument-call` can either be a map containing `:names` and an optional
    `:nickname` (e.g. `{:names [\"piano\" \"trumpet\"] :nickname
    [\"trumpiano\"]}`) or a valid Alda instrument call string, e.g.
    `\"piano/trumpet 'trumpiano'\"`.
@@ -267,9 +267,9 @@
              (note-length 16)
              (ms 250))
    ;;=> #alda.core.Duration{
-          :components (#alda.core.NoteLength{:number 8, :dots 1}
-                       #alda.core.NoteLength{:number 16, :dots 0}
-                       #alda.core.Milliseconds{:number 250})}
+   ;;=>   :components (#alda.core.NoteLength{:number 8, :dots 1}
+   ;;=>                #alda.core.NoteLength{:number 16, :dots 0}
+   ;;=>                #alda.core.Milliseconds{:number 250})}
 
    (->str (duration (note-length 8 {:dots 1})
                     (note-length 16)
@@ -314,11 +314,11 @@
    ```clojure
    (note (pitch :d :flat))
    ;;=> #alda.core.Note{
-          :pitch #alda.core.LetterAndAccidentals{
-                   :letter :d,
-                   :accidentals (:flat)},
-          :duration nil,
-          :slurred? nil}
+   ;;=>   :pitch #alda.core.LetterAndAccidentals{
+   ;;=>            :letter :d,
+   ;;=>            :accidentals (:flat)},
+   ;;=>   :duration nil,
+   ;;=>   :slurred? nil}
 
    (->str (note (pitch :d :flat)))
    ;;=> \"d-\"
@@ -402,24 +402,24 @@
           (note (pitch :e))
           (note (pitch :g)))
    ;;=> #alda.core.Chord{
-          :events (#alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :c,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :e,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :g,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil})}
+   ;;=>   :events (#alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :c,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :e,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :g,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil})}
 
    (->str (chord (note (pitch :c))
                  (note (pitch :e))
@@ -735,37 +735,37 @@
          (note (pitch :f))
          (note (pitch :e)))
    ;;=> #alda.core.Cram{
-          :duration #alda.core.NoteLength{:number 2, :dots 0},
-          :events (#alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :e,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :f,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :e,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :f,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :e,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil})}
+   ;;=>   :duration #alda.core.NoteLength{:number 2, :dots 0},
+   ;;=>   :events (#alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :e,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :f,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :e,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :f,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :e,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil})}
 
    (->str (cram (note-length 2)
                 (note (pitch :e))
@@ -815,25 +815,25 @@
                  (note (pitch :f))
                  (note (pitch :a)))
    ;;=> #alda.core.SetVariable{
-          :name \"riffA\",
-          :events (#alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :d,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :f,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil}
-                   #alda.core.Note{
-                     :pitch #alda.core.LetterAndAccidentals{
-                              :letter :a,
-                              :accidentals nil},
-                     :duration nil,
-                     :slurred? nil})}
+   ;;=>   :name \"riffA\",
+   ;;=>   :events (#alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :d,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :f,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil}
+   ;;=>            #alda.core.Note{
+   ;;=>              :pitch #alda.core.LetterAndAccidentals{
+   ;;=>                       :letter :a,
+   ;;=>                       :accidentals nil},
+   ;;=>              :duration nil,
+   ;;=>              :slurred? nil})}
 
    (->str (set-variable \"riffA\"
                         (note (pitch :d))
@@ -914,20 +914,20 @@
   Stringify
   (-str [{:keys [form]}] (pr-str form)))
 
-(defmacro lisp-builtin
+(defmacro ^:private lisp-builtin
   [sym]
   `(defn ~sym
      ~(format "Emits inline Lisp code `(%s ...)`" sym)
      [& ~'args]
      (map->Sexp {:form (list* '~sym ~'args)})))
 
-(defmacro lisp-builtins
+(defmacro ^:private lisp-builtins
   [& syms]
   (cons 'do
         (for [sym syms]
           `(lisp-builtin ~sym))))
 
-(defmacro lisp-builtin-attributes
+(defmacro ^:private lisp-builtin-attributes
   [& syms]
   (cons 'do
         (for [sym syms]
