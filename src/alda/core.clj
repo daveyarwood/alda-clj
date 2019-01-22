@@ -2,9 +2,47 @@
   (:require [clojure.java.shell :as sh]
             [clojure.string     :as str]))
 
-(def ^:dynamic *alda-executable* "alda")
+(def ^:dynamic *alda-executable*
+  "The path to the `alda` executable.
+
+   The default value is \"alda\", which will depend on your PATH."
+  "alda")
 
 (defn alda
+  "Invokes `alda` at the command line, using `args` as arguments.
+
+   The return value is the string of STDOUT, if the command was successful, i.e.
+   if the exit code was 0.
+
+   If the exit code is non-zero, an ex-info is thrown, including context about
+   the result and what command was run.
+
+   Examples:
+
+   ```clojure
+   (alda \"version\")
+   ;;=> \"Client version: 1.2.0\\nServer version: [27713] 1.2.0\\n\"
+
+   (alda \"parse\" \"-c\" \"bassoon: o3 c\")
+   ;;=> \"{\\\"chord-mode\\\":false,\\\"current-instruments\\\":[\\\"bassoon-ZXXDZ\\\"],...}\\n\"
+
+   (alda \"\\\"make me a sandwich\\\"\")
+   ;;=> ExceptionInfo Non-zero exit status.  clojure.core/ex-info (core.clj:4739)
+   ;;=> #error {
+   ;;=>  :cause \"Non-zero exit status.\"
+   ;;=>  :data {:exit 3,
+   ;;=>         :out \"Expected a command, got \\\"make me a sandwich\\\"\\n\\nFor usage instructions, see --help.\\n\",
+   ;;=>         :err \"\",
+   ;;=>         :command (\"alda\" \"\\\"make me a sandwich\\\"\")}
+   ;;=>  :via
+   ;;=>  [{:type clojure.lang.ExceptionInfo
+   ;;=>    :message \"Non-zero exit status.\"
+   ;;=>    :data {:exit 3, ...}
+   ;;=>    :at [clojure.core$ex_info invokeStatic \"core.clj\" 4739]}]
+   ;;=>  :trace
+   ;;=>  [[clojure.core$ex_info invokeStatic \"core.clj\" 4739]
+   ;;=>   ...]}
+   ```"
   [& args]
   (let [command (cons *alda-executable* args)
         {:keys [exit out] :as result} (apply sh/sh command)]
@@ -13,16 +51,24 @@
       (throw (ex-info "Non-zero exit status."
                       (assoc result :command command))))))
 
-;; Alda 1.x: We retain context when playing one score snippet after another by
-;; tracking everything we send in a "history" string and sending it along with
-;; every request.
-(def ^:dynamic *alda-history* "")
+;; Relevant to Alda 1.x. This will work differently in Alda 2.x.
+(def ^:dynamic *alda-history*
+  "A string representing the score so far. This is used as the value of the
+   `--history` option for the `alda play` command when calling `play!`.
+
+   This provides Alda with context about the score, including which instrument
+   is active, its current octave, current default note length, etc.
+
+   Each time `play!` is successful, the string of code that was played is
+   appended to `*alda-history*`."
+  "")
 
 (defn clear-history!
+  "Resets `*alda-history*` to \"\"."
   []
   (alter-var-root #'*alda-history* (constantly "")))
 
-(defprotocol Stringify
+(defprotocol ^:no-doc Stringify
   (-str [this]))
 
 ;; When provided with a sequence of events, ->str intelligently injects spaces
@@ -32,6 +78,12 @@
 (declare ->str)
 
 (defn play!
+  "Converts its arguments into a string of Alda code and sends it to the Alda
+   CLI to be parsed and played.
+
+   `*alda-history*` is sent along for context.
+
+   Returns the string of code that was sent to `alda play`."
   [& xs]
   (let [code (->str xs)]
     (alda "play" "--history" *alda-history* "--code" code)
@@ -39,6 +91,7 @@
     code))
 
 (defn stop!
+  "Runs `alda stop`, stopping playback."
   []
   (alda "stop"))
 
@@ -64,11 +117,35 @@
   "Sets the current instrument instance(s) based on `instrument-call`.
 
    `instrument-call` can either be a map containing :names and an optional
-   :nickname (e.g. {:names [\"piano\" \"trumpet\"] :nickname [\"trumpiano\"]})
-   or a valid Alda instrument call string, e.g. \"piano/trumpet 'trumpiano'\".
+   `:nickname` (e.g. `{:names [\"piano\" \"trumpet\"] :nickname
+   [\"trumpiano\"]}`) or a valid Alda instrument call string, e.g.
+   `\"piano/trumpet 'trumpiano'\"`.
 
    For convenience, single quotes can be used around the nickname instead of
-   double quotes."
+   double quotes.
+
+   Examples:
+   ```clojure
+   (part \"piano\")
+   ;;=> #alda.core.InstrumentCall{:names [\"piano\"],
+                                  :nickname nil}
+
+   (part \"piano/trumpet\")
+   ;;=> #alda.core.InstrumentCall{:names [\"piano\" \"trumpet\"],
+                                  :nickname nil}
+
+   (part {:names [\"piano\" \"trumpet\"] :nickname \"trumpiano\"})
+   ;;=> #alda.core.InstrumentCall{:names [\"piano\" \"trumpet\"],
+                                  :nickname \"trumpiano\"}
+
+   (->str (part {:names [\"piano\" \"trumpet\"] :nickname \"trumpiano\"}))
+   ;;=> \"piano/trumpet \\\"trumpiano\\\":\"
+
+   (play!
+     (part \"piano/trumpet 'trumpiano'\")
+     (note (pitch :c)))
+   ;;=> \"piano/trumpet \\\"trumpiano\\\":\\nc\"
+   ```"
   [x]
   (let [instrument-call (cond
                           (map? x)
@@ -90,6 +167,25 @@
            (map {:flat \- :sharp \+ :natural \_} accidentals))))
 
 (defn pitch
+  "Returns the pitch component of a note.
+
+   Examples:
+
+   ```clojure
+   (pitch :c :sharp)
+   ;;=> #alda.core.LetterAndAccidentals{:letter :c, :accidentals (:sharp)}
+
+   (->str (pitch :c :sharp))
+   ;;=> \"c+\"
+
+   (->str (pitch :g))
+   ;;=> \"g\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :c)))
+   ;;=> \"piano:\\nc\"
+   ```"
   [letter & accidentals]
   (map->LetterAndAccidentals {:letter letter :accidentals accidentals}))
 
@@ -113,6 +209,25 @@
     (apply str number (repeat dots \.))))
 
 (defn note-length
+  "Returns a note length component, which is expressed as an integer (e.g. `4`
+   is a quarter note) and, optionally, 1 or more dots (e.g. to make a dotted
+   quarter note, double dotted half note, etc.).
+
+   Examples:
+
+   ```clojure
+   (note-length 8)
+   ;;=> #alda.core.NoteLength{:number 8, :dots 0}
+
+   (->str (note-length 4 {:dots 2}))
+   ;;=> \"4..\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :c)
+           (note-length 1 {:dots 1})))
+   ;;=> \"piano:\\nc1.\"
+   ```"
   [number & [{:keys [dots]}]]
   (map->NoteLength {:number number :dots (or dots 0)}))
 
@@ -122,10 +237,53 @@
     (str number "ms")))
 
 (defn ms
+  "Returns a millisecond note length component.
+
+   Examples:
+
+   ```clojure
+   (ms 456)
+   ;;=> #alda.core.Milliseconds{:number 456}
+
+   (ms 456)
+   ;;=> \"456ms\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :c) (ms 1005)))
+   ;;=> \"piano:\\nc1005ms\"
+   ```"
   [number]
   (map->Milliseconds {:number number}))
 
 (defn duration
+  "Returns a duration component, which consists of multiple note length
+   components \"tied\" together.
+
+   Examples:
+
+   ```clojure
+   (duration (note-length 8 {:dots 1})
+             (note-length 16)
+             (ms 250))
+   ;;=> #alda.core.Duration{
+          :components (#alda.core.NoteLength{:number 8, :dots 1}
+                       #alda.core.NoteLength{:number 16, :dots 0}
+                       #alda.core.Milliseconds{:number 250})}
+
+   (->str (duration (note-length 8 {:dots 1})
+                    (note-length 16)
+                    (ms 250)))
+   ;;=> \"8.~16~250ms\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :c)
+           (duration (note-length 1)
+                     (note-length 1)
+                     (note-length 2 {:dots 1}))))
+   ;;=> \"piano:\\nc1~1~2.\"
+   ```"
   [& components]
   (map->Duration {:components components}))
 
@@ -143,7 +301,41 @@
 
    If no duration is specified, the note is played for the instrument's own
    internal duration, which will be the duration last specified on a note or
-   rest in that instrument's part."
+   rest in that instrument's part.
+
+   A third argument, `slur?` may be optionally included. When truthy, this
+   includes a final slur (`~`) to be appended to the code that is generated.
+   This means the note will be sustained for the absolute fullest value, with
+   minimal space between this note and the next. (By default, there is a small
+   amount of space between notes.)
+
+   Examples:
+
+   ```clojure
+   (note (pitch :d :flat))
+   ;;=> #alda.core.Note{
+          :pitch #alda.core.LetterAndAccidentals{
+                   :letter :d,
+                   :accidentals (:flat)},
+          :duration nil,
+          :slurred? nil}
+
+   (->str (note (pitch :d :flat)))
+   ;;=> \"d-\"
+
+   (->str (note (pitch :f) (note-length 8)))
+   ;;=> \"f8\"
+
+   (->str (note (pitch :f)
+                (duration (note-length 1) (note-length 8))
+                :slur))
+   ;;=> \"f1~8~\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :g)))
+   ;;=> \"piano:\\ng\"
+   ```"
   [pitch & [duration slur?]]
   (map->Note {:pitch    pitch
               :duration duration
@@ -159,7 +351,27 @@
 
    If no duration is specified, each instrument will rest for its own internal
    duration, which will be the duration last specified on a note or rest in that
-   instrument's part."
+   instrument's part.
+
+   Examples:
+
+   ```clojure
+   (pause (note-length 2))
+   ;;=> #alda.core.Rest{:duration #alda.core.NoteLength{:number 2, :dots 0}}
+
+   (->str (pause (note-length 2)))
+   ;;=> \"r2\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :c) (note-length 8))
+     (pause (note-length 8))
+     (note (pitch :c) (note-length 8))
+     (pause (note-length 8))
+     (note (pitch :c) (note-length 8))
+     (pause (note-length 8)))
+   ;;=> \"piano:\\nc8 r8 c8 r8 c8 r8\"
+   ```"
   [& [duration]]
   (map->Rest {:duration duration}))
 
@@ -181,7 +393,47 @@
    at the instrument's current offset.
 
    Events may include notes, rests, and attribute change (e.g. octave change)
-   events."
+   events.
+
+   Examples:
+
+   ```clojure
+   (chord (note (pitch :c))
+          (note (pitch :e))
+          (note (pitch :g)))
+   ;;=> #alda.core.Chord{
+          :events (#alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :c,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :e,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :g,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil})}
+
+   (->str (chord (note (pitch :c))
+                 (note (pitch :e))
+                 (note (pitch :g))))
+   ;;=> \"c / e / g\"
+
+   (play!
+     (part \"piano\")
+     (chord (note (pitch :e))
+            (note (pitch :g))
+            (octave :up)
+            (note (pitch :c))))
+   ;;=> \"piano:\\ne / g > / c\"
+   ```"
   [& events]
   (map->Chord {:events events}))
 
@@ -200,7 +452,44 @@
 (defn octave
   "Sets the current octave, which is used to calculate the pitch of notes.
 
-   `value` can be an octave number, :up or :down."
+   `value` can be an octave number, `:up` or `:down`.
+
+   Examples:
+
+   ```clojure
+   (octave 3)
+   ;;=> #alda.core.OctaveSet{:octave-number 3}
+
+
+   (->str (octave 3))
+   ;;=> \"o3\"
+
+   (octave :down)
+   ;;=> #alda.core.OctaveShift{:direction :down}
+
+   (->str (octave :down))
+   ;;=> \"<\"
+
+   (play!
+     (part \"piano\")
+     (octave 0)
+     (note (pitch :c) (note-length 8))
+     (octave :up)
+     (note (pitch :c))
+     (octave :up)
+     (note (pitch :c))
+     (octave :up)
+     (note (pitch :c))
+     (octave :up)
+     (note (pitch :c))
+     (octave :up)
+     (note (pitch :c))
+     (octave :up)
+     (note (pitch :c))
+     (octave :up)
+     (note (pitch :c)))
+   ;;=> \"piano:\\no0 c8 > c > c > c > c > c > c > c\"
+   ```"
   [value]
   (cond
     (number? value)
@@ -218,7 +507,31 @@
 
 (defn barline
   "Barlines, at least currently, do nothing beyond visually separating other
-   events."
+   events.
+
+   Examples:
+
+   ```clojure
+   (barline)
+   ;;=> #alda.core.Barline{}
+
+   (->str (barline))
+   ;;=> \"|\"
+
+   (play!
+     (part \"piano\")
+     (note (pitch :c) (note-length 4))
+     (note (pitch :d) (note-length 8))
+     (note (pitch :e))
+     (note (pitch :f))
+     (note (pitch :g))
+     (note (pitch :a))
+     (note (pitch :b))
+     (octave :up)
+     (barline)
+     (note (pitch :c)))
+   ;;=> \"piano:\\nc4 d8 e f g a b > | c\"
+   ```"
   []
   (->Barline))
 
@@ -228,7 +541,38 @@
     (str \% name)))
 
 (defn marker
-  "Places a marker at the current absolute offset."
+  "Places a marker at the current absolute offset.
+
+   Examples:
+
+   ```clojure
+   (marker \"verse-1\")
+   ;;=> #alda.core.Marker{:name \"verse-1\"}
+
+   (->str (marker \"verse-1\"))
+   ;;=> \"%verse-1\"
+
+   (println
+     (play!
+       (part \"piano\")
+       \"o4 c8 d e f\"
+       (marker \"here\")
+       \"g2\"
+
+       (part \"electric-bass\")
+       (at-marker \"here\")
+       \"o2 g2\"
+
+       (part \"trombone\")
+       (at-marker \"here\")
+       \"o3 b2\"))
+   ;;=> piano:
+   ;;=> o4 c8 d e f %here g2
+   ;;=> electric-bass:
+   ;;=> @here o2 g2
+   ;;=> trombone:
+   ;;=> @here o3 b2
+   ```"
   [name]
   (map->Marker {:name name}))
 
@@ -239,7 +583,38 @@
 
 (defn at-marker
   "Sets the active instruments' current offset to the offset of the marker with
-   the provided name."
+   the provided name.
+
+   Examples:
+
+   ```clojure
+   (at-marker \"verse-1\")
+   ;;=> #alda.core.AtMarker{:name \"verse-1\"}
+
+   (->str (at-marker \"verse-1\"))
+   ;;=> \"@verse-1\"
+
+   (println
+     (play!
+       (part \"piano\")
+       \"o4 c8 d e f\"
+       (marker \"here\")
+       \"g2\"
+
+       (part \"electric-bass\")
+       (at-marker \"here\")
+       \"o2 g2\"
+
+       (part \"trombone\")
+       (at-marker \"here\")
+       \"o3 b2\"))
+   ;;=> piano:
+   ;;=> o4 c8 d e f %here g2
+   ;;=> electric-bass:
+   ;;=> @here o2 g2
+   ;;=> trombone:
+   ;;=> @here o3 b2
+   ```"
   [name]
   (map->AtMarker {:name name}))
 
@@ -251,7 +626,44 @@
 (defn voice
   "Begins a voice identified by `number`.
 
-   Until the voice group ends, all voices are played simultaneously."
+   Until the voice group ends, all voices are played simultaneously.
+
+   Examples:
+
+   ```clojure
+
+   (voice 2)
+   ;;=> #alda.core.Voice{:number 2}
+
+   (->str (voice 2))
+   ;;=> \"V2:\"
+
+   (play!
+     (part \"clarinet\")
+
+     (voice 1)
+     (octave 4)
+     (note (pitch :c) (note-length 8))
+     (note (pitch :d))
+     (note (pitch :e))
+     (note (pitch :f) (note-length 2))
+
+     (voice 2)
+     (octave 4)
+     (note (pitch :e) (note-length 8))
+     (note (pitch :f))
+     (note (pitch :g))
+     (note (pitch :a) (note-length 2))
+
+     (voice 3)
+     (octave 4)
+     (note (pitch :g) (note-length 8))
+     (note (pitch :a))
+     (note (pitch :b))
+     (octave :up)
+     (note (pitch :c) (note-length 2))))
+   ;;=> \"clarinet:\\nV1: o4 c8 d e f2 V2: o4 e8 f g a2 V3: o4 g8 a b > c2\"
+   ```"
   [number]
   (map->Voice {:number number}))
 
@@ -261,7 +673,44 @@
 
 (defn end-voices
   []
-  "Ends the current voice group."
+  "Ends the current voice group.
+
+   Examples:
+
+   ```clojure
+   (end-voices)
+   ;;=> #alda.core.EndVoices{}
+
+   (->str (end-voices))
+   ;;=> \"V0:\"
+
+   (play!
+     (part \"piano\")
+
+     (voice 1)
+     (octave 4)
+     (note (pitch :c) (note-length 8))
+     (note (pitch :d))
+     (note (pitch :e))
+     (note (pitch :f))
+     (note (pitch :g))
+     (note (pitch :a))
+
+     (voice 2)
+     (octave 3)
+     (note (pitch :g) (note-length 4 {:dots 1}))
+     (note (pitch :d) (note-length 4 {:dots 1}))
+
+     (end-voices)
+
+     (octave 3)
+     (chord
+       (note (pitch :f) (note-length 1))
+       (octave :up)
+       (note (pitch :c))
+       (note (pitch :a))))
+   ;;=> \"piano:\\nV1: o4 c8 d e f g a V2: o3 g4. d4. V0: o3 f1 > / c / a\"
+   ```"
   (->EndVoices))
 
 (defrecord Cram [duration events]
@@ -274,7 +723,74 @@
 (defn cram
   "A cram expression time-scales the events it contains based on the ratio of
    the \"inner duration\" of the events to the \"outer duration\" of each
-   current instrument."
+   current instrument.
+
+   Examples:
+
+   ```clojure
+   (cram (note-length 2)
+         (note (pitch :e))
+         (note (pitch :f))
+         (note (pitch :e))
+         (note (pitch :f))
+         (note (pitch :e)))
+   ;;=> #alda.core.Cram{
+          :duration #alda.core.NoteLength{:number 2, :dots 0},
+          :events (#alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :e,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :f,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :e,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :f,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :e,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil})}
+
+   (->str (cram (note-length 2)
+                (note (pitch :e))
+                (note (pitch :f))
+                (note (pitch :e))
+                (note (pitch :f))
+                (note (pitch :e))))
+   ;;=> \"{ e f e f e }2\"
+
+   (play!
+     (part \"piano\")
+     (octave 4)
+     (cram (note-length 1)
+       (note (pitch :c))
+       (note (pitch :d))
+       (cram nil
+         (note (pitch :e))
+         (note (pitch :f))
+         (note (pitch :g)))
+       (note (pitch :a))
+       (note (pitch :b)))
+     (octave :up)
+     (note (pitch :c)))
+   ;;=> \"piano:\\no4 { c d { e f g } a b }1 > c\"
+   ```"
   [duration & events]
   (map->Cram {:duration duration :events events}))
 
@@ -289,7 +805,52 @@
 
 (defn set-variable
   "Defines any number of events as a variable so that they can be referenced by
-   name."
+   name.
+
+   Examples:
+
+   ```clojure
+   (set-variable \"riffA\"
+                 (note (pitch :d))
+                 (note (pitch :f))
+                 (note (pitch :a)))
+   ;;=> #alda.core.SetVariable{
+          :name \"riffA\",
+          :events (#alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :d,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :f,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil}
+                   #alda.core.Note{
+                     :pitch #alda.core.LetterAndAccidentals{
+                              :letter :a,
+                              :accidentals nil},
+                     :duration nil,
+                     :slurred? nil})}
+
+   (->str (set-variable \"riffA\"
+                        (note (pitch :d))
+                        (note (pitch :f))
+                        (note (pitch :a))))
+   ;;=> \"riffA = d f a\"
+
+   (play!
+     (set-variable \"riffA\"
+                   (note (pitch :d))
+                   (note (pitch :f))
+                   (note (pitch :a)))
+
+     (part \"piano\")
+     (get-variable \"riffA\"))
+   ;;=> \"riffA = d f a\\npiano:\\nriffA\"
+   ```"
   [var-name & events]
   (map->SetVariable {:name var-name :events events}))
 
@@ -299,7 +860,27 @@
     name))
 
 (defn get-variable
-  "Returns any number of events previously defined as a variable."
+  "Returns any number of events previously defined as a variable.
+
+   Examples:
+
+   ```clojure
+   (get-variable \"riffA\")
+   ;;=> #alda.core.GetVariable{:name \"riffA\"}
+
+   (->str (get-variable \"riffA\"))
+   ;;=> \"riffA\"
+
+   (play!
+     (set-variable \"riffA\"
+                   (note (pitch :d))
+                   (note (pitch :f))
+                   (note (pitch :a)))
+
+     (part \"piano\")
+     (get-variable \"riffA\"))
+   ;;=> \"riffA = d f a\\npiano:\\nriffA\"
+   ```"
   [var-name]
   (map->GetVariable {:name var-name}))
 
@@ -317,6 +898,10 @@
        (apply str)))
 
 (defn ->str
+  "Converts a value into a string of Alda code.
+
+   This function is used under the hood by `play!` to convert its arguments into
+   a string of code to send to the Alda CLI."
   [x]
   (cond
     (string? x)     x
@@ -332,7 +917,7 @@
 (defmacro lisp-builtin
   [sym]
   `(defn ~sym
-     ~(format "Emits inline Lisp code (%s ...)" sym)
+     ~(format "Emits inline Lisp code `(%s ...)`" sym)
      [& ~'args]
      (map->Sexp {:form (list* '~sym ~'args)})))
 
