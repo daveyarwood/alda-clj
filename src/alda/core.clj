@@ -268,7 +268,8 @@
   Stringify
   (-str [{:keys [duration events]}]
     (->str ["{" events
-            (str "}" (or (->str duration) ""))])))
+            (str "}"
+                 (if duration (->str duration) ""))])))
 
 (defn cram
   "A cram expression time-scales the events it contains based on the ratio of
