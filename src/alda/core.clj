@@ -54,13 +54,13 @@
 ;; Relevant to Alda 1.x. This will work differently in Alda 2.x.
 (def ^:dynamic *alda-history*
   "A string representing the score so far. This is used as the value of the
-   `--history` option for the `alda play` command when calling `play!`.
+   `--history` option for the `alda play` command when calling [[play!]].
 
    This provides Alda with context about the score, including which instrument
    is active, its current octave, current default note length, etc.
 
-   Each time `play!` is successful, the string of code that was played is
-   appended to `*alda-history*`."
+   Each time [[play!]] is successful, the string of code that was played is
+   appended to [[*alda-history*]]."
   "")
 
 (defn clear-history!
@@ -78,10 +78,10 @@
 (declare ->str)
 
 (defn play!
-  "Converts its arguments into a string of Alda code (via `->str`) and sends it
-   to the Alda CLI to be parsed and played.
+  "Converts its arguments into a string of Alda code (via [[->str]]) and sends
+   it to the Alda CLI to be parsed and played.
 
-   `*alda-history*` is sent along for context.
+   [[*alda-history*]] is sent along for context.
 
    Returns the string of code that was sent to `alda play`."
   [& xs]
@@ -900,8 +900,8 @@
 (defn ->str
   "Converts a value into a string of Alda code.
 
-   This function is used under the hood by `play!` to convert its arguments into
-   a string of code to send to the Alda CLI."
+   This function is used under the hood by [[play!]] to convert its arguments
+   into a string of code to send to the Alda CLI."
   [x]
   (cond
     (string? x)     x
