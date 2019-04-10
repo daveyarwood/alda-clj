@@ -1,0 +1,25 @@
+#!/usr/bin/env clojure
+;; vim: ft=clojure
+
+(require '[alda.core :refer :all])
+
+(def riff "c8 < g a b >")
+
+(play!
+  (part "organ")
+  (quant 70) (octave 3)
+
+  (for [[semitones bpm]
+        (->> [0 70]
+             (iterate (fn [[s b]] [(inc s) (+ b 20)]))
+             (take 25))]
+    [(transpose semitones)
+     (tempo bpm)
+     riff])
+
+  (note (pitch :c) (ms 5000)))
+
+(println "Press Ctrl-C to stop & exit.")
+
+(.addShutdownHook (Runtime/getRuntime)
+  (Thread. #(stop!)))
