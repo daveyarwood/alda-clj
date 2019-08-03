@@ -10,7 +10,7 @@
    Steve Reich
 
    sheet music:
-   https://sites.ualberta.ca/~michaelf/SEM-O/SEM-O_2014/Steve's%20piece/clapping_reich.jpg")
+   http://earreader.nl/wp-content/uploads/2016/01/SteveReich-ClappingMusic.pdf")
 
 (def pattern
   (let [clap "o2 d+8"
