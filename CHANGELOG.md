@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.2.0 (2019-08-17)
+## 0.2.1 (2019-08-17)
 
 * Added `midi-note` function that can be used to specify the pitch of a note as
   a MIDI note number, instead of `pitch` which specifies pitch as a letter and
