@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 0.2.0 (2019-08-17)
+
+* Added `midi-note` function that can be used to specify the pitch of a note as
+  a MIDI note number, instead of `pitch` which specifies pitch as a letter and
+  accidentals.
+
+* Implementation detail: added a LispForm protocol and `->lisp-form` wrapper
+  function. Objects that implement the LispForm protocol are representable in
+  alda-lisp, and `->lisp-form` returns the corresponding Lisp S-expression for
+  that object.
+
+  These S-expressions are rendered directly into Alda as opposed to having a
+  syntax representation like `c+`. This allows us to make use of Alda features
+  that are implemented only in Lisp to avoid adding additional syntax to the
+  language.
+
+  Example: `(->lisp-form (note (midi-note 42))) => (note (midi-note 42))`
+
 ## 0.1.8 (2019-02-21)
 
 No change; bumped version to tweak the docs.

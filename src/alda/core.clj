@@ -77,6 +77,21 @@
 ;; we can define ->str.
 (declare ->str)
 
+(defprotocol ^:no-doc LispForm
+  (-lisp-form [this]))
+
+(defn ->lisp-form
+  "Returns an S-expression representation of its argument, which must implement
+   the LispForm protocol.
+
+   Objects that implement the LispForm protocol have corresponding Lisp
+   representations in alda-lisp."
+  [object]
+  (when-not (satisfies? LispForm object)
+    (throw (ex-info "LispForm protocol not implemented."
+                    {:object object, :object-type (type object)})))
+  (-lisp-form object))
+
 (defn play!
   "Converts its arguments into a string of Alda code (via [[->str]]) and sends
    it to the Alda CLI to be parsed and played.
@@ -164,7 +179,11 @@
   (-str [{:keys [letter accidentals]}]
     (apply str
            (name letter)
-           (map {:flat \- :sharp \+ :natural \_} accidentals))))
+           (map {:flat \- :sharp \+ :natural \_} accidentals)))
+
+  LispForm
+  (-lisp-form [{:keys [letter accidentals]}]
+    (list* 'pitch letter accidentals)))
 
 (defn pitch
   "Returns the pitch component of a note.
@@ -189,6 +208,46 @@
   [letter & accidentals]
   (map->LetterAndAccidentals {:letter letter :accidentals accidentals}))
 
+(defrecord MidiNoteNumber [note-number]
+  LispForm
+  (-lisp-form [{:keys [note-number]}]
+    (list 'midi-note note-number)))
+
+(defn midi-note
+  "Returns the pitch component of a note, expressed as a MIDI note number.
+
+   See also [[pitch]], which expresses pitch as a letter and accidentals.
+
+   > [[->str]] cannot be used on a MIDI note number component directly because
+   > there is no native Alda syntax for a MIDI note number; this feature is only
+   > accessible via the `midi-note` alda-lisp function.
+   >
+   > In alda-clj, just like in alda-lisp, `midi-note` can be used instead of
+   > `pitch` as the pitch component of a note. To stringify a note with a
+   > `midi-note` pitch component, we fallback to emitting alda-lisp code.
+
+   Examples:
+
+   ```clojure
+   (midi-note 42)
+   ;;=> #alda.core.MidiNoteNumber{:note-number 42}
+
+   (->lisp-form (midi-note 42))
+   ;;=> (midi-note 42)
+
+   (->str (midi-note 42))
+   ;;=> Execution error (IllegalArgumentException) at alda.core/eval160$fn$G (core.clj:71).
+   ;;=> No implementation of method: :-str of protocol: #'alda.core/Stringify found for class: alda.core.MidiNoteNumber
+
+   (->str (note (midi-note 42) (note-length 8)))
+   ;;=> \"(note (midi-note 42) (note-length 8))\"
+
+   (->str (note (pitch :c) (note-length 8)))
+   ;;=> \"c8\"
+   ```"
+  [note-number]
+  (map->MidiNoteNumber {:note-number note-number}))
+
 (defrecord Tie []
   Stringify
   (-str [_] "~"))
@@ -201,12 +260,22 @@
   Stringify
   (-str [{:keys [components]}]
     (str/join (->str (->Tie))
-              (map ->str components))))
+              (map ->str components)))
+
+  LispForm
+  (-lisp-form [{:keys [components]}]
+    (list* 'duration (map ->lisp-form components))))
 
 (defrecord NoteLength [number dots]
   Stringify
   (-str [{:keys [number dots]}]
-    (apply str number (repeat dots \.))))
+    (apply str number (repeat dots \.)))
+
+  LispForm
+  (-lisp-form [{:keys [number dots]}]
+    (list* 'note-length number (if (and dots (pos? dots))
+                                 [{:dots dots}]
+                                 []))))
 
 (defn note-length
   "Returns a note length component, which is expressed as an integer (e.g. `4`
@@ -289,11 +358,21 @@
 
 (defrecord Note [pitch duration slurred?]
   Stringify
-  (-str [{:keys [pitch duration slurred?]}]
-    (str (->str pitch)
-         (when duration (->str duration))
-         (when slurred?
-           (->str (->Slur))))))
+  (-str [{:keys [pitch duration slurred?] :as note}]
+    (if (instance? MidiNoteNumber pitch)
+      (->str (->lisp-form note))
+      (str (->str pitch)
+           (when duration (->str duration))
+           (when slurred?
+             (->str (->Slur))))))
+
+  LispForm
+  (-lisp-form [{:keys [pitch duration slurred?]}]
+    (remove nil?
+            (list 'note
+                  (->lisp-form pitch)
+                  (when duration (->lisp-form duration))
+                  (when slurred? :slur)))))
 
 (defn note
   "Causes every active instrument to play a note at its current offset for the
