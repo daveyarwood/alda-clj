@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.2 (2019-08-17)
+
+* Implemented the LispForm protocol on Milliseconds note duration objects. This
+  fixes a bug where `midi-note` and `ms` couldn't be used together, e.g.
+  `(note (midi-note 60) (ms 2000))`.
+
 ## 0.2.1 (2019-08-17)
 
 * Added `midi-note` function that can be used to specify the pitch of a note as

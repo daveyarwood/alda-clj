@@ -303,7 +303,11 @@
 (defrecord Milliseconds [number]
   Stringify
   (-str [{:keys [number]}]
-    (str number "ms")))
+    (str number "ms"))
+
+  LispForm
+  (-lisp-form [{:keys [number]}]
+    (list 'ms number)))
 
 (defn ms
   "Returns a millisecond note length component.
