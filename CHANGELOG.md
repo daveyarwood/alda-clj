@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.2.3 (2020-01-27)
+
+No change; bumped version to publish improvements to the Getting Started docs.
+
 ## 0.2.2 (2019-08-17)
 
 * Implemented the LispForm protocol on Milliseconds note duration objects. This
