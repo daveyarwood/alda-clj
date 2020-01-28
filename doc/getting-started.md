@@ -1,5 +1,96 @@
 # Getting Started
 
+## Setup
+
+### Alda
+
+[Install Alda][install-alda] and start the server by running `alda up`.
+
+### Clojure
+
+If you haven't already, [install the Clojure command-line
+tools][install-clojure].
+
+There are several ways that you can set up a Clojure environment where you can
+use alda-clj:
+
+1. If you have an existing Clojure project that uses [Leiningen][leiningen] or
+   [Boot][boot], you can add `[io.djy/alda-clj "LATEST"]` to the dependencies in
+   your project.clj or build.boot.
+
+2. You can start a REPL that includes alda-clj as a dependency:
+
+   ```
+   $ clj -Sdeps '{:deps {io.djy/alda-clj {:mvn/version "LATEST"}}}'
+   Downloading: io/djy/alda-clj/maven-metadata.xml from https://repo.clojars.org/
+   Downloading: io/djy/alda-clj/0.2.2/alda-clj-0.2.2.pom from https://repo.clojars.org/
+   Downloading: io/djy/alda-clj/0.2.2/alda-clj-0.2.2.jar from https://repo.clojars.org/
+   Clojure 1.10.1
+   user=> (require '[alda.core :refer :all])
+   nil
+   user=> (alda "version")
+   "Client version: 1.3.3\nServer version: [27713] 1.3.3\n"
+   ```
+
+3. You can write all of your Clojure code in a single file:
+
+   ```
+   $ cat demo.clj
+   (require '[alda.core :refer :all])
+
+   (println (alda "version"))
+
+   (System/exit 0)
+   $ clojure -Sdeps '{:deps {io.djy/alda-clj {:mvn/version "LATEST"}}}' demo.clj
+   Client version: 1.3.3
+   Server version: [27713] 1.3.3
+   ```
+
+4. You can [make a new Clojure project][new-clj-project] that includes alda-clj
+   as a dependency by creating a directory structure that looks like this...
+
+   ```
+   .
+   ├── deps.edn
+   └── src
+       └── something.clj
+   ```
+
+   ...putting the following in `deps.edn`...
+
+   ```clojure
+   {:deps {io.djy/alda-clj {:mvn/version "LATEST"}}}
+   ```
+
+   ...and putting your Clojure code in `src/something.clj`...
+
+   ```clojure
+   (ns something
+     (:require [alda.core :refer :all]))
+
+   (defn -main
+     []
+     (println (alda "version"))
+     (System/exit 0))
+   ```
+
+   ...and then run the main function:
+
+   ```bash
+   $ clojure -m something
+   Client version: 1.3.3
+   Server version: [27713] 1.3.3
+   ```
+
+Once you're set up, you can follow along by copy-pasting the examples below into
+your Clojure source file or REPL.
+
+[install-alda]: https://github.com/alda-lang/alda#installation
+[install-clojure]: https://clojure.org/guides/getting_started
+[leiningen]: https://leiningen.org/
+[boot]: https://boot-clj.com/
+[new-clj-project]: https://clojure.org/guides/deps_and_cli#_writing_a_program
+
 ## Basics
 
 Each element of Alda's syntax has a corresponding function in [alda.core].
@@ -29,9 +120,12 @@ alda.core:
 (note (pitch :c))
 ```
 
-Assuming you have [Alda installed][install-alda] and the server is running
-(`alda up`), you can play this score from your Clojure REPL by wrapping it in a
-call to `alda.core/play!` and evaluating the form:
+But the code above doesn't actually _do_ anything. Each of the forms simply
+returns a Clojure record representing an Alda _event_ such as a note, an octave
+change, a part declaration, etc.
+
+You can turn this into a score and play it by passing the events as arguments to
+`alda.core/play!`:
 
 ```clojure
 (play!
@@ -55,7 +149,6 @@ generated and sent to the Alda client:
 ```
 
 [alda.core]: https://cljdoc.org/d/io.djy/alda-clj/CURRENT/api/alda.core
-[install-alda]: https://github.com/alda-lang/alda#installation
 
 You can always stop playback if things get out of hand:
 
@@ -96,15 +189,15 @@ This is what allows scores to be played incrementally, e.g.:
 
 ;; play a few notes, still on the guitar
 (play!
-  (notes (pitch :a))
-  (notes (pitch :b) (note-length 2)))
+  (note (pitch :a))
+  (note (pitch :b) (note-length 2)))
 ```
 
 Between invocations of `play!`, the Alda client "remembers" which instrument(s)
 were active and all of their properties (octave, volume, panning, etc.) so that
 the context is not lost.
 
-The history can be cleared at will:
+The history can be cleared whenever you want to start over:
 
 ```clojure
 (clear-history!)
