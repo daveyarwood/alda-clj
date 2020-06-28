@@ -19,10 +19,12 @@ results.
 > Clojure code in Alda to generate interesting musical scores by using
 > functional programming techniques. If you'd like to see this in action, I
 > recommend the live demo portions of the talks that I gave in [Japan in
-> 2016][farm2016] and [Australia in 2018][compose2018].
+> 2016][farm2016], [Australia in 2018][compose2018], and [St. Louis in
+> 2019][strangeloop2019].
 
 [farm2016]: https://youtu.be/c5pCFtwO4j8?t=374
 [compose2018]: https://youtu.be/7nbBSwopG-E?t=593
+[strangeloop2019]: https://youtu.be/6hUihVWdgW0?t=1573
 
 I've grown really attached to this aspect of creating music with Alda. I think
 there are some very pleasing parallels between writing FP code in Clojure and
