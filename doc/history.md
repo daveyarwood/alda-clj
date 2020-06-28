@@ -75,9 +75,10 @@ conclusion that Alda should be simplified to be just the parts where it excels,
 and whenever it's desired, additional complexity can be added orthogonally with
 external tools.
 
-But I still want to live-code Alda by writing Clojure code!
+**But I still want to live-code Alda by writing Clojure code!**
 
 Luckily, I found a way to still do that, but in a more sensible way that offers
-all of the same features, but doesn't require Alda to be implemented in Clojure
-or allow one to execute arbitrary Clojure code inside the Alda server process.
+all of the same features, but it doesn't require Alda to be implemented in
+Clojure or allow one to execute arbitrary Clojure code inside the Alda server
+process.
 
