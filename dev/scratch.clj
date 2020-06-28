@@ -91,5 +91,26 @@
   (play!
     (part "piano")
     (for [n (repeatedly 8 #(+ 100 (rand-int 1500)))]
-      (note (pitch :c) (ms n)))))
+      (note (pitch :c) (ms n))))
+
+  (defn random-note
+    []
+    (let [letter     (rand-nth [:c :d :e :f :g :a :b :c])
+          accidental (rand-nth [:sharp :flat nil])]
+      (note (if accidental
+              (pitch letter accidental)
+              (pitch letter)))))
+
+  (defn random-chord
+    []
+    (apply chord (repeatedly (rand-int 6) random-note)))
+
+  (->str (random-chord))
+
+  (play!
+    (part "piano")
+    (set-note-length 1)
+    (random-chord)
+    (random-chord)
+    (random-chord)))
 
