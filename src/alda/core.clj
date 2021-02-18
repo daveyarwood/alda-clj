@@ -1,5 +1,6 @@
 (ns alda.core
-  (:require [clojure.java.shell :as sh]
+  (:require [jsonista.core      :as json]
+            [clojure.java.shell :as sh]
             [clojure.string     :as str]))
 
 (def ^:dynamic *alda-executable*
@@ -1024,3 +1025,167 @@
 (lisp-builtins
   set-duration set-note-length octave!)
 
+(defn- event-duration-map->Duration
+  [{:keys [components]}]
+  (map->Duration {:components (map (fn [{:keys [denominator dots]}]
+                                     (note-length denominator dots))
+                                   components)}))
+
+(defmulti event-map->record (fn [event-map]
+                              (select-keys event-map [:type
+                                                      :attribute])))
+
+(defmethod event-map->record :default
+  [event-map]
+  (throw (ex-info "Unknown event type." {:event-map event-map})))
+
+(defmethod event-map->record {:type "part-declaration"}
+  [{:keys [value]}]
+  (map->InstrumentCall value))
+
+(defmethod event-map->record {:type "note"}
+  [{{:keys [duration pitch slurred?]} :value}]
+  (map->Note {:pitch    (map->LetterAndAccidentals (update pitch :accidentals #(map keyword %)))
+              :duration (event-duration-map->Duration duration)
+              :slurred? slurred?}))
+
+(defmethod event-map->record {:type "rest"}
+  [{{:keys [duration]} :value}]
+  (map->Rest {:duration (event-duration-map->Duration duration)}))
+
+(defmethod event-map->record {:type "chord"}
+  [{{:keys [events]} :value}]
+  (map->Chord {:events (map event-map->record events)}))
+
+(defmethod event-map->record {:type "cram"}
+  [{:keys [value]}]
+  (map->Cram value))
+
+(defmethod event-map->record {:type "barline"}
+  [_]
+  (->Barline))
+
+(defmethod event-map->record {:type "marker"}
+  [{:keys [value]}]
+  (map->Marker value))
+
+(defmethod event-map->record {:type "at-marker"}
+  [{:keys [value]}]
+  (map->AtMarker value))
+
+(defmethod event-map->record {:type "voice-marker"}
+  [{:keys [value]}]
+  (map->Voice value))
+
+(defmethod event-map->record {:type "voice-group-end-marker"}
+  [_]
+  (->EndVoices))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "octave"}
+  [{:keys [value]}]
+  (cond
+    (number? value)
+    (map->OctaveSet {:octave-number value})
+
+    (#{"up" "down"} value)
+    (map->OctaveShift {:direction (keyword value)})
+
+    :else
+    (throw (ex-info "Invalid octave value." {:value value}))))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "tempo"}
+  [{:keys [value]}]
+  (tempo value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "volume"}
+  [{:keys [value]}]
+  (volume value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "track-volume"}
+  [{:keys [value]}]
+  (track-volume value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "panning"}
+  [{:keys [value]}]
+  (panning value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "quantization"}
+  [{:keys [value]}]
+  (quantization value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "key-signature"}
+  [{:keys [value]}]
+  (key-signature value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "transposition"}
+  [{:keys [value]}]
+  (transposition value))
+
+(defmethod event-map->record {:type "attribute-update"
+                              :attribute "reference-pitch"}
+  [{:keys [value]}]
+  (reference-pitch value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "octave"}
+  [{:keys [value]}]
+  (octave! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "tempo"}
+  [{:keys [value]}]
+  (tempo! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "volume"}
+  [{:keys [value]}]
+  (volume! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "track-volume"}
+  [{:keys [value]}]
+  (track-volume! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "panning"}
+  [{:keys [value]}]
+  (panning! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "quantization"}
+  [{:keys [value]}]
+  (quantization! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "key-signature"}
+  [{:keys [value]}]
+  (key-signature! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "transposition"}
+  [{:keys [value]}]
+  (transposition! value))
+
+(defmethod event-map->record {:type "global-attribute-update"
+                              :attribute "reference-pitch"}
+  [{:keys [value]}]
+  (reference-pitch! value))
+
+(defn parse-events!
+  "Converts its arguments into a string of Alda code (via [[->str]]) and sends
+   it to the Alda CLI to be parsed into events JSON.
+   
+   Returns a seq of deserialized records."
+  [& xs]
+  (map event-map->record
+       (json/read-value
+        (alda "parse" "--output" "events" "--code" (->str xs))
+        json/keyword-keys-object-mapper)))

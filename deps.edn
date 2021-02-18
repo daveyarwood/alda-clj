@@ -1,5 +1,5 @@
 {:paths   ["src"]
- :deps    {}
+ :deps    {metosin/jsonista {:mvn/version "0.3.1"}}
  :aliases {:pack
            {:extra-deps {pack/pack.alpha
                          {:git/url "https://github.com/juxt/pack.alpha.git"
