@@ -78,6 +78,6 @@ you just want to chat about alda-clj!
 
 ## License
 
-Copyright © 2018-2019 Dave Yarwood
+Copyright © 2018-2021 Dave Yarwood
 
 Distributed under the Eclipse Public License version 2.0.
