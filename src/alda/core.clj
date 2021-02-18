@@ -1179,7 +1179,7 @@
   [{:keys [value]}]
   (reference-pitch! value))
 
-(defn parse-events!
+(defn parse-events
   "Converts its arguments into a string of Alda code (via [[->str]]) and sends
    it to the Alda CLI to be parsed into events JSON.
 
