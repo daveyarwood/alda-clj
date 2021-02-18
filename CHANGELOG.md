@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## Unreleased
+
+* Added a `parse-events` function that takes any combination of strings of Alda
+  code and alda-clj event records, runs them through `alda parse --output
+  events`, and returns a sequence of alda-clj event records that results from
+  translating the JSON output.
+
+  (Note: This works with Alda v2 only.)
+
+  Thanks, [@wcerfgba][wcerfgba], for the contribution!
+
 ## 0.2.3 (2020-01-27)
 
 No change; bumped version to publish improvements to the Getting Started docs.
@@ -74,3 +85,4 @@ No change; I had to bump the version while tinkering with deployment setup.
 Initial release. I think things are relatively stable, but report any issues you
 may run into!
 
+[wcerfgba]: https://github.com/wcerfgba
