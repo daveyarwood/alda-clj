@@ -1,7 +1,7 @@
 (ns alda.core
-  (:require [jsonista.core      :as json]
-            [clojure.java.shell :as sh]
-            [clojure.string     :as str]))
+  (:require [clojure.java.shell :as sh]
+            [clojure.string     :as str]
+            [jsonista.core      :as json]))
 
 (def ^:dynamic *alda-executable*
   "The path to the `alda` executable.
@@ -1182,10 +1182,10 @@
 (defn parse-events!
   "Converts its arguments into a string of Alda code (via [[->str]]) and sends
    it to the Alda CLI to be parsed into events JSON.
-   
+
    Returns a seq of deserialized records."
   [& xs]
   (map event-map->record
        (json/read-value
-        (alda "parse" "--output" "events" "--code" (->str xs))
-        json/keyword-keys-object-mapper)))
+         (alda "parse" "--output" "events" "--code" (->str xs))
+         json/keyword-keys-object-mapper)))
