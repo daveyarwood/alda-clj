@@ -1045,7 +1045,10 @@
 
 (defmethod event-map->record {:type "note"}
   [{{:keys [duration pitch slurred?]} :value}]
-  (map->Note {:pitch    (map->LetterAndAccidentals (update pitch :accidentals #(map keyword %)))
+  (map->Note {:pitch    (map->LetterAndAccidentals
+                          (-> pitch
+                              (update :letter str/lower-case)
+                              (update :accidentals #(map keyword %))))
               :duration (event-duration-map->Duration duration)
               :slurred? slurred?}))
 
