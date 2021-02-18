@@ -7,6 +7,6 @@
             :main-opts  ["-m"]}
 
            :deploy
-           {:extra-deps {deps-deploy {:mvn/version "RELEASE"}}
+           {:extra-deps {deps-deploy/deps-deploy {:mvn/version "RELEASE"}}
             :main-opts  ["-m" "deps-deploy.deps-deploy"
                          "deploy" "alda-clj.jar"]}}}
