@@ -46,7 +46,10 @@
    ```"
   [& args]
   (let [command (cons *alda-executable* args)
-        {:keys [exit out] :as result} (apply sh/sh command)]
+        {:keys [exit err out] :as result} (apply sh/sh command)]
+    (when (seq err)
+      (binding [*out* *err*]
+        (println (str/trim err))))
     (if (zero? exit)
       out
       (throw (ex-info "Non-zero exit status."
