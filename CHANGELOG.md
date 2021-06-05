@@ -1,13 +1,13 @@
 # CHANGELOG
 
-## Unreleased
+## 0.3.0 (???)
+
+* alda-clj now requires version 2.0.0 or greater.
 
 * Added a `parse-events` function that takes any combination of strings of Alda
   code and alda-clj event records, runs them through `alda parse --output
   events`, and returns a sequence of alda-clj event records that results from
   translating the JSON output.
-
-  (Note: This works with Alda v2 only.)
 
   Thanks, [@wcerfgba][wcerfgba], for the contribution!
 
