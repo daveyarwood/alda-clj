@@ -35,9 +35,8 @@ alda-clj is intended to be used in at least two ways:
 
 > **NOTE**: alda-clj requires Alda version 2.0.0 or greater.
 
-1. If you haven't already, [install
-Alda](https://github.com/alda-lang/alda#installation) and make sure `alda` is
-available on your `PATH`.
+1. If you haven't already, [install Alda](https://alda.io/install) and make sure
+   `alda` is available on your `PATH`.
 
   > alda-clj will shell out and use `alda` (wherever it's found on your `PATH`) to
   > play your scores. If desired, you can specify an alternate `alda` executable
