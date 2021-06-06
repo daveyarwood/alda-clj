@@ -4,9 +4,8 @@
 (comment
   (stop!)
   (clear-history!)
-  (alda "version")
-  (alda "status")
-  *alda-history*
+  (println (alda "version"))
+  (println (alda "--help"))
   (play! (part "piano:"))
   (play! (part "bassoon/trumpet \"bars\""))
   (play! (part {:names ["violin" "viola"] :nickname "strings"}))
@@ -103,7 +102,7 @@
 
   (defn random-chord
     []
-    (apply chord (repeatedly (rand-int 6) random-note)))
+    (apply chord (repeatedly (+ 2 (rand-int 4)) random-note)))
 
   (->str (random-chord))
 
