@@ -216,9 +216,16 @@
     code))
 
 (defn stop!
-  "Runs `alda stop`, stopping playback."
+  "Stops playback.
+
+   When connected to an Alda REPL server, this is done by sending a \"stop\"
+   message to the server.
+
+   Otherwise, we stop playback globally by running `alda stop`."
   []
-  (alda "stop"))
+  (if *alda-nrepl-server-info*
+    (send-nrepl-message! {:op "stop"})
+    (alda "stop")))
 
 (defrecord InstrumentCall [names nickname]
   Stringify
