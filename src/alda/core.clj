@@ -185,17 +185,34 @@
   (binding [*out* *err*]
     (println "Un-set Alda REPL server host/port.")))
 
+(defn send-nrepl-message!
+  "Sends an nREPL message to the Alda REPL server defined in
+   *alda-nrepl-server-info*.
+
+   (See [[connect!]] and [[disconnect!]] for information about configuring
+   alda-clj to talk to your Alda REPL server."
+  [msg]
+  (let [{:keys [host port]} *alda-nrepl-server-info*]
+    (when-not (and host port)
+      (throw (ex-info
+               "Unspecified Alda REPL host/port. Use `connect!` first."
+               {:server-info *alda-nrepl-server-info*})))
+    (-> (alda "repl"
+              "--host" host
+              "--port" (str port)
+              "--message" (json/write-value-as-string msg))
+        json/read-value)))
+
 (defn play!
   "Converts its arguments into a string of Alda code (via [[->str]]) and sends
    it to the Alda CLI to be parsed and played.
 
-   [[*alda-history*]] is sent along for context.
-
    Returns the string of code that was sent to `alda play`."
   [& xs]
   (let [code (->str xs)]
-    (alda "play" "--history" *alda-history* "--code" code)
-    (alter-var-root #'*alda-history* str code \newline)
+    (if *alda-nrepl-server-info*
+      (send-nrepl-message! {:op "eval-and-play", :code code})
+      (alda "play" "--code" code))
     code))
 
 (defn stop!
