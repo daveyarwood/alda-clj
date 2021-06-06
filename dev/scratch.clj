@@ -1,9 +1,12 @@
 (ns scratch
-  (:require [alda.core :refer :all]))
+  (:require [alda.core :refer :all] :reload-all))
 
 (comment
   (stop!)
-  (clear-history!)
+  (connect!)
+  (disconnect!)
+  (println (score-text))
+  (new-score!)
   (println (alda "version"))
   (println (alda "--help"))
   (play! (part "piano:"))
