@@ -163,8 +163,7 @@
       (throw (ex-info ":port not specified and no .alda-nrepl-port file found."
                       {:server-info server-info})))
     (alter-var-root #'*alda-nrepl-server-info* (constantly server-info))
-    (binding [*out* *err*]
-      (println "Set Alda REPL server host/port." server-info))))
+    (println "Alda REPL server host/port set:" server-info)))
 
 (defn disconnect!
   "Clears out the host and port number used internally by alda-clj to send
@@ -177,8 +176,7 @@
    See [[connect!]] for more information."
   []
   (alter-var-root #'*alda-nrepl-server-info* (constantly nil))
-  (binding [*out* *err*]
-    (println "Un-set Alda REPL server host/port.")))
+  (println "Alda REPL server host/port un-set."))
 
 (defn require-connection!
   []
