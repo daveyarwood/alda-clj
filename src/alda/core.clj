@@ -86,11 +86,6 @@
                              :args args))))
     out))
 
-(defn clear-history!
-  "Resets `*alda-history*` to `\"\"`."
-  []
-  (alter-var-root #'*alda-history* (constantly "")))
-
 (defprotocol ^:no-doc Stringify
   (-str [this]))
 
@@ -185,6 +180,13 @@
   (binding [*out* *err*]
     (println "Un-set Alda REPL server host/port.")))
 
+(defn require-connection!
+  []
+  (when-not *alda-nrepl-server-info*
+    (throw (ex-info
+             "Unspecified Alda REPL host/port. Use `connect!` first."
+             {}))))
+
 (defn send-nrepl-message!
   "Sends an nREPL message to the Alda REPL server defined in
    *alda-nrepl-server-info*.
@@ -192,16 +194,33 @@
    (See [[connect!]] and [[disconnect!]] for information about configuring
    alda-clj to talk to your Alda REPL server."
   [msg]
+  (require-connection!)
   (let [{:keys [host port]} *alda-nrepl-server-info*]
-    (when-not (and host port)
-      (throw (ex-info
-               "Unspecified Alda REPL host/port. Use `connect!` first."
-               {:server-info *alda-nrepl-server-info*})))
     (-> (alda "repl"
               "--host" host
               "--port" (str port)
               "--message" (json/write-value-as-string msg))
         json/read-value)))
+
+(defn score-text
+  "Returns the string of Alda code that is \"loaded\" into the Alda REPL session.
+
+   Throws an exception if you haven't connected to an Alda REPL server yet.
+   (See [[connect!]] for more information.)"
+  []
+  (require-connection!)
+  (-> (send-nrepl-message! {:op "score-text"})
+      (get "text")
+      str/trim))
+
+(defn new-score!
+  "Resets the Alda REPL server's state and initializes a new score.
+
+   Throws an exception if you haven't connected to an Alda REPL server yet.
+   (See [[connect!]] for more information.)"
+  []
+  (require-connection!)
+  (send-nrepl-message! {:op "new-score"}))
 
 (defn play!
   "Converts its arguments into a string of Alda code (via [[->str]]) and sends
