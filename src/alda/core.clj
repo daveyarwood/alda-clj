@@ -1,5 +1,5 @@
 (ns alda.core
-  (:require [clojure.java.shell :as sh]
+  (:require [alda.shell         :as sh]
             [clojure.string     :as str]
             [jsonista.core      :as json])
   (:import [java.io File]
@@ -11,16 +11,30 @@
    The default value is \"alda\", which will depend on your PATH."
   "alda")
 
+(defn- alda*
+  "Like [[alda]], but doesn't throw an exception when the exit code is
+   non-zero.
+
+   Shell output is streamed to stdout and stderr as it is produced
+   (implementation adapted from boot.util/sh).
+
+   Returns a map containing:
+     :exit  exit code      (int)
+     :out   stdout output  (string)
+     :err   stderr output  (string)"
+  [& args]
+  (apply sh/sh (cons *alda-executable* args)))
+
 (defn alda
   "Invokes `alda` at the command line, using `args` as arguments.
 
    The return value is the string of stdout, if the command was successful, i.e.
    if the exit code was 0.
 
-   Stderr output is printed verbatim on stderr.
-
    If the exit code is non-zero, an ex-info is thrown, including context about
    the result and what command was run.
+
+   Stdout and stderr output are printed as they are produced.
 
    Examples:
 
@@ -64,27 +78,13 @@
    ;;=> Non-zero exit status.
    ```"
   [& args]
-  (let [command (cons *alda-executable* args)
-        {:keys [exit err out] :as result} (apply sh/sh command)]
-    (when (seq err)
-      (binding [*out* *err*]
-        (println (str/trim err))))
-    (if (zero? exit)
-      out
+  (let [{:keys [exit out] :as result} (apply alda* args)]
+    (when-not (zero? exit)
       (throw (ex-info "Non-zero exit status."
-                      (assoc result :command command))))))
-
-;; Relevant to Alda 1.x. This will work differently in Alda 2.x.
-(def ^:dynamic *alda-history*
-  "A string representing the score so far. This is used as the value of the
-   `--history` option for the `alda play` command when calling [[play!]].
-
-   This provides Alda with context about the score, including which instrument
-   is active, its current octave, current default note length, etc.
-
-   Each time [[play!]] is successful, the string of code that was played is
-   appended to [[*alda-history*]]."
-  "")
+                      (assoc result
+                             :command *alda-executable*
+                             :args args))))
+    out))
 
 (defn clear-history!
   "Resets `*alda-history*` to `\"\"`."
