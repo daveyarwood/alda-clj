@@ -7,8 +7,8 @@
   (disconnect!)
   (println (score-text))
   (new-score!)
-  (println (alda "version"))
-  (println (alda "--help"))
+  (alda "doctor")
+  (alda "--help")
   (play! (part "piano:"))
   (play! (part "bassoon/trumpet \"bars\""))
   (play! (part {:names ["violin" "viola"] :nickname "strings"}))
@@ -114,5 +114,15 @@
     (set-note-length 1)
     (random-chord)
     (random-chord)
-    (random-chord)))
+    (random-chord))
+
+  (play!
+    '(key-sig! '(a major))
+    (part "piano")
+    (note (pitch :c) (note-length 8))
+    (note (pitch :d))
+    (note (pitch :e))
+    (note (pitch :f))
+    (note (pitch :g))))
+
 
