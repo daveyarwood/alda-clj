@@ -166,7 +166,7 @@
         server-info {:host host :port port}]
     (when-not port
       (throw (ex-info ":port not specified and no .alda-nrepl-port file found."
-                      server-info)))
+                      {:server-info server-info})))
     (alter-var-root #'*alda-nrepl-server-info* (constantly server-info))
     (binding [*out* *err*]
       (println "Set Alda REPL server host/port." server-info))))
