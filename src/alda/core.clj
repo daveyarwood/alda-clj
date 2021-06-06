@@ -14,8 +14,10 @@
 (defn alda
   "Invokes `alda` at the command line, using `args` as arguments.
 
-   The return value is the string of STDOUT, if the command was successful, i.e.
+   The return value is the string of stdout, if the command was successful, i.e.
    if the exit code was 0.
+
+   Stderr output is printed verbatim on stderr.
 
    If the exit code is non-zero, an ex-info is thrown, including context about
    the result and what command was run.
@@ -24,27 +26,42 @@
 
    ```clojure
    (alda \"version\")
-   ;;=> \"Client version: 1.2.0\\nServer version: [27713] 1.2.0\\n\"
+   ;;=> \"alda 1.99.4\\n\"
 
    (alda \"parse\" \"-c\" \"bassoon: o3 c\")
-   ;;=> \"{\\\"chord-mode\\\":false,\\\"current-instruments\\\":[\\\"bassoon-ZXXDZ\\\"],...}\\n\"
+   ;;=> \"{\\\"aliases\\\":{},\\\"current-parts\\\":[\\\"0xc0002509c0\\\"],...\"
 
    (alda \"\\\"make me a sandwich\\\"\")
-   ;;=> ExceptionInfo Non-zero exit status.  clojure.core/ex-info (core.clj:4739)
-   ;;=> #error {
-   ;;=>  :cause \"Non-zero exit status.\"
-   ;;=>  :data {:exit 3,
-   ;;=>         :out \"Expected a command, got \\\"make me a sandwich\\\"\\n\\nFor usage instructions, see --help.\\n\",
-   ;;=>         :err \"\",
-   ;;=>         :command (\"alda\" \"\\\"make me a sandwich\\\"\")}
-   ;;=>  :via
-   ;;=>  [{:type clojure.lang.ExceptionInfo
-   ;;=>    :message \"Non-zero exit status.\"
-   ;;=>    :data {:exit 3, ...}
-   ;;=>    :at [clojure.core$ex_info invokeStatic \"core.clj\" 4739]}]
-   ;;=>  :trace
-   ;;=>  [[clojure.core$ex_info invokeStatic \"core.clj\" 4739]
-   ;;=>   ...]}
+   ;;=> Usage:
+   ;;=>   alda [command]
+   ;;=>
+   ;;=> Available Commands:
+   ;;=>   doctor      Run health checks to determine if Alda can run correctly
+   ;;=>   export      Evaluate Alda source code and export to another format
+   ;;=>   help        Help about any command
+   ;;=>   instruments Display the list of available instruments
+   ;;=>   parse       Display the result of parsing Alda source code
+   ;;=>   play        Evaluate and play Alda source code
+   ;;=>   ps          List background processes
+   ;;=>   repl        Start an Alda REPL client/server
+   ;;=>   shutdown    Shut down background processes
+   ;;=>   stop        Stop playback
+   ;;=>   telemetry   Enable or disable telemetry
+   ;;=>   update      Update to the latest version of Alda
+   ;;=>   version     Print Alda version information
+   ;;=>
+   ;;=> Flags:
+   ;;=>   -v, --verbosity int   verbosity level (0-3) (default 1)
+   ;;=>
+   ;;=> Use \"alda [command] --help\" for more information about a command.
+   ;;=>
+   ;;=> ---
+   ;;=>
+   ;;=> Usage error:
+   ;;=>
+   ;;=>   unknown command \"make me a sandwich\" for \"alda\"
+   ;;=> Execution error (ExceptionInfo) at alda.core/alda (core.clj:58).
+   ;;=> Non-zero exit status.
    ```"
   [& args]
   (let [command (cons *alda-executable* args)
