@@ -1127,6 +1127,23 @@
                       (spaced x))
     :else           (-str x)))
 
+;; FIXME: There is an issue with quoting, where the context about which forms
+;; are quoted and which aren't gets lost in translation.
+;;
+;; For example, this works:
+;;   '(key-sig! '(a major))    ; translates into (key-sig! (quote (a major)))
+;;
+;; But this does not:
+;;   (key-sig! '(a major))     ; translates into (key-sig! (a major))
+;;
+;; alda-lisp doesn't like the second one because `a` cannot be resolved.
+;;
+;; I think the point where we are losing information is in the implementation of
+;; Stringify for Sexp, where we call `(pr-str form)`.
+;;
+;; Potential solution: do some code walking, figure out which arguments appear
+;; to be quoted (if that's possible?) and wrap them in `(quote ...)`, before
+;; calling `(pr-str ...)`
 (defrecord Sexp [form]
   Stringify
   (-str [{:keys [form]}] (pr-str form)))
