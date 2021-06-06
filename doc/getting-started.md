@@ -4,11 +4,17 @@
 
 ### Alda
 
-[Install Alda][install-alda] and start the server by running `alda up`.
+First things first: you'll need to [install Alda][install-alda], if you haven't
+done that already.
+
+> alda-clj requires Alda version 2.0.0 or greater.
+
+You can run `alda doctor` to verify that you have a working installation of
+Alda.
 
 ### Clojure
 
-If you haven't already, [install the Clojure command-line
+If you don't already have `clojure` / `clj`, [install the Clojure command-line
 tools][install-clojure].
 
 There are several ways that you can set up a Clojure environment where you can
@@ -23,13 +29,14 @@ use alda-clj:
    ```
    $ clj -Sdeps '{:deps {io.djy/alda-clj {:mvn/version "LATEST"}}}'
    Downloading: io/djy/alda-clj/maven-metadata.xml from https://repo.clojars.org/
-   Downloading: io/djy/alda-clj/0.2.2/alda-clj-0.2.2.pom from https://repo.clojars.org/
-   Downloading: io/djy/alda-clj/0.2.2/alda-clj-0.2.2.jar from https://repo.clojars.org/
+   Downloading: io/djy/alda-clj/0.3.0/alda-clj-0.3.0.pom from https://repo.clojars.org/
+   Downloading: io/djy/alda-clj/0.3.0/alda-clj-0.3.0.jar from https://repo.clojars.org/
    Clojure 1.10.1
    user=> (require '[alda.core :refer :all])
    nil
    user=> (alda "version")
-   "Client version: 1.3.3\nServer version: [27713] 1.3.3\n"
+   alda 2.0.0
+   "alda 2.0.0\n"
    ```
 
 3. You can write all of your Clojure code in a single file:
@@ -38,12 +45,11 @@ use alda-clj:
    $ cat demo.clj
    (require '[alda.core :refer :all])
 
-   (println (alda "version"))
+   (alda "version")
 
    (System/exit 0)
    $ clojure -Sdeps '{:deps {io.djy/alda-clj {:mvn/version "LATEST"}}}' demo.clj
-   Client version: 1.3.3
-   Server version: [27713] 1.3.3
+   alda 2.0.0
    ```
 
 4. You can [make a new Clojure project][new-clj-project] that includes alda-clj
@@ -70,7 +76,7 @@ use alda-clj:
 
    (defn -main
      []
-     (println (alda "version"))
+     (alda "version")
      (System/exit 0))
    ```
 
@@ -78,14 +84,13 @@ use alda-clj:
 
    ```bash
    $ clojure -m something
-   Client version: 1.3.3
-   Server version: [27713] 1.3.3
+   alda 2.0.0
    ```
 
 Once you're set up, you can follow along by copy-pasting the examples below into
 your Clojure source file or REPL.
 
-[install-alda]: https://github.com/alda-lang/alda#installation
+[install-alda]: https://alda.io/install
 [install-clojure]: https://clojure.org/guides/getting_started
 [leiningen]: https://leiningen.org/
 [boot]: https://boot-clj.com/
@@ -163,44 +168,117 @@ comfort of your REPL:
 
 ```clojure
 ;; like running "alda version" in a terminal
-(println (alda "version"))
+(alda "version")
 
-;; like running "alda status" in a terminal
-(println (alda "status"))
+;; like running "alda doctor" in a terminal
+(alda "doctor")
+
+;; like running "alda instruments" in a terminal
+(alda "instruments")
 ```
 
-## History
+The output is printed on stdout and stderr, just like if you were running the
+commands in a terminal.
 
-Each time you successfully `play!` something, the generated Alda code is
-appended to `alda.core/*alda-history*`, a string of Alda code representing the
-score so far that is sent along for context on each call to the `alda` client.
-This is what allows scores to be played incrementally, e.g.:
+If the command was successful (i.e. the exit code was 0), the full output on
+stdout is also returned as a string, for convenience.
+
+## Connecting to an Alda REPL server
+
+By default, alda-clj is _not_ connected to an Alda REPL server. You can still
+use `play!` to play scores, like we did above, however, each time you call
+`play!`, the score is evaluated in a _separate context_.
+
+For a better understanding of what this means, try evaluating the following
+expressions, one at a time:
 
 ```clojure
-;; conjure a guitar
+;; Play a few notes on the guitar.
 (play!
-  (part "guitar"))
-
-;; play a few notes on the guitar
-(play!
+  (part "guitar")
   (note (pitch :e) (note-length 8))
   (note (pitch :f :sharp))
   (note (pitch :g)))
 
-;; play a few notes, still on the guitar
+;; Play a couple more notes on the guitar?
 (play!
   (note (pitch :a))
   (note (pitch :b) (note-length 2)))
 ```
 
-Between invocations of `play!`, the Alda client "remembers" which instrument(s)
-were active and all of their properties (octave, volume, panning, etc.) so that
-the context is not lost.
+Unless you are connected to an Alda REPL, you will only hear the notes in the
+first expression. The second expression will run successfully, but you won't
+hear anything. Why? Because the second expression is equivalent to running the
+following `alda play` command at the command line:
 
-The history can be cleared whenever you want to start over:
+```bash
+alda play --code "a b2"
+```
+
+And no instrument is specified, so it makes no sound.
+
+Wouldn't it be nice if you could play your score a little bit at a time? Well,
+if you connect to an Alda REPL server, then you can do exactly that!
+
+To start an Alda REPL server, run `alda repl --server` in your terminal. You
+should see some output that tells you which port the server is running on:
+
+```
+nREPL server started on port 40105 on host localhost - nrepl://localhost:40105
+```
+
+Now, in your Clojure REPL (or program), use the `connect!` function to connect
+to the Alda REPL server:
 
 ```clojure
-(clear-history!)
+;; Replace 40105 with the port that was printed when you started the Alda REPL
+;; server.
+(connect! {:port 40105})
+```
+
+If you started both your Clojure REPL/program and your Alda REPL server in the
+same directory, you can omit the port argument and alda-clj will figure it out
+by reading a file created by the Alda REPL server (`.alda-nrepl-port`).
+
+```clojure
+(connect!)
+```
+
+Now, you can write and play your scores incrementally!
+
+```clojure
+;; Conjure a guitar.
+(play!
+  (part "guitar"))
+
+;; Play a few notes on the guitar.
+(play!
+  (note (pitch :e) (note-length 8))
+  (note (pitch :f :sharp))
+  (note (pitch :g)))
+
+;; Play a couple more notes, still on the guitar.
+(play!
+  (note (pitch :a))
+  (note (pitch :b) (note-length 2)))
+```
+
+Between invocations of `play!`, the Alda REPL server is keeping track of which
+instrument(s) are active and all of their properties (octave, volume, panning,
+etc.) so that the context is not lost. This is useful for live coding, as well
+as for quickly trying things out when you're composing a score.
+
+Whenever you want to erase this context and start over from a clean slate, you
+can reset the state of the Alda REPL server:
+
+```clojure
+(new-score!)
+```
+
+To see the Alda code that has been evaluated so far in your current score:
+
+```clojure
+(println (score-text))
 ```
 
 ## Notes
@@ -375,11 +453,11 @@ emitted verbatim into the string of generated Alda code:
 ;;=> "(tempo! 160) piano:\nc8 d e f g"
 ```
 
-Another way is that alda.core includes convenience functions for most (maybe
-even all?) of the functions like `tempo!` that are available in the Alda Lisp
-environment. Whenever alda.core includes one of these functions, you can simply
-call it and it will have the same effect as emitting the S-expression directly
-into the generated Alda code:
+Another way is that alda.core includes convenience functions for the functions
+like `tempo!` that are available in the Alda Lisp environment. Whenever
+alda.core includes one of these functions, you can simply call it and it will
+have the same effect as emitting the S-expression directly into the generated
+Alda code:
 
 ```clojure
 (play!
