@@ -4,24 +4,13 @@
 
 [![cljdoc badge](https://cljdoc.org/badge/io.djy/alda-clj)](https://cljdoc.org/d/io.djy/alda-clj/CURRENT)
 
-A Clojure library for live-coding music with [Alda](https://alda.io).
+alda-clj is a Clojure library for algorithmic music composition and live-coding
+with [Alda](https://alda.io).
 
-## Background and rationale
-
-See [History](https://cljdoc.org/d/io.djy/alda-clj/CURRENT/doc/readme/history)
-for a long-winded account of the path that led to alda-clj.
-
-## How does it work?
-
-alda-clj is a Clojure DSL that is almost identical to the `alda.lisp` DSL built
-into the runtime of Alda 1.x. But instead of being part of the process that
-generates and plays the Alda score, **alda-clj generates a string of Alda code
-and sends it to the `alda` client**.
-
-The idea is simple: `alda` is just a low-level tool for playing a score that's
-already been written (or generated). When you want to go higher-level and create
-scores programmatically, you can do so in an external process and pipe the
-result to `alda`. alda-clj is one way to do this.
+A simple Clojure DSL provides useful functions like `note` and `chord` that can
+be composed together to create a musical score. The resulting values are
+translated into a string of Alda code and played in a subprocess via the `alda`
+command line client.
 
 alda-clj is intended to be used in at least two ways:
 
