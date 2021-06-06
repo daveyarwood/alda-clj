@@ -1,7 +1,9 @@
 (ns alda.core
   (:require [clojure.java.shell :as sh]
             [clojure.string     :as str]
-            [jsonista.core      :as json]))
+            [jsonista.core      :as json])
+  (:import [java.io File]
+           [java.nio.file Paths]))
 
 (def ^:dynamic *alda-executable*
   "The path to the `alda` executable.
@@ -95,6 +97,76 @@
     (throw (ex-info "LispForm protocol not implemented."
                     {:object object, :object-type (type object)})))
   (-lisp-form object))
+
+(defn read-alda-nrepl-port-file
+  "If an .alda-nrepl-port file is present in the current directory, reads the
+   file and returns the port number that the Alda REPL server is running on.
+
+   Returns nil if the file doesn't exist, e.g. if you didn't start a REPL in
+   the current directory by running `alda repl --server`.
+
+   Throws an exception if an integer can't be parsed from the contents of the
+   file. (This should never happen!)"
+  []
+  (let [port-file-path (str (Paths/get
+                              (System/getProperty "user.dir")
+                              (into-array [".alda-nrepl-port"])))]
+    (when (.isFile (File. port-file-path))
+      (Integer/parseInt (slurp port-file-path)))))
+
+(def ^:dynamic *alda-nrepl-server-info* nil)
+
+(defn connect!
+  "Sets the host and port number used internally by alda-clj to send messages to
+   the Alda REPL server.
+
+   By default, alda-clj uses `alda play` on every call to `(play! ...)` to play
+   each score in an isolated context. This might be sufficient if you're just
+   experimenting or trying out the alda-clj library for the first time and you
+   don't feel like starting an Alda REPL server.
+
+   For a better experience when live-coding or composing interactively, start an
+   Alda REPL server by running `alda repl --server`, and then use
+   (`connect! ...)` to configure alda-clj to talk to the Alda REPL server.
+
+   When called without arguments, `(connect!)` assumes that the REPL server is
+   running on localhost and attempts to read the port from the
+   `.alda-nrepl-port` file that Alda created.
+
+   To specify a different host or port, you can include a map as an argument,
+   e.g.:
+
+   ```clojure
+   (connect! {:port 12345})              ; localhost:12345
+   (connect! {:host \"1.2.3.4\" 12345})  ; 1.2.3.4:12345
+   ```
+
+   To restore the default state where alda-clj uses `alda play` instead of
+   talking to an Alda REPL server, use [[disconnect!]]."
+  [& [{:keys [host port]
+       :or {host "localhost"}}]]
+  (let [port        (or port (read-alda-nrepl-port-file))
+        server-info {:host host :port port}]
+    (when-not port
+      (throw (ex-info ":port not specified and no .alda-nrepl-port file found."
+                      server-info)))
+    (alter-var-root #'*alda-nrepl-server-info* (constantly server-info))
+    (binding [*out* *err*]
+      (println "Set Alda REPL server host/port." server-info))))
+
+(defn disconnect!
+  "Clears out the host and port number used internally by alda-clj to send
+   messages to the Alda REPL server.
+
+   This puts alda-clj back into its default state, where it uses `alda play` on
+   every call to `(play! ...)` instead of sending messages to an Alda REPL
+   server.
+
+   See [[connect!]] for more information."
+  []
+  (alter-var-root #'*alda-nrepl-server-info* (constantly nil))
+  (binding [*out* *err*]
+    (println "Un-set Alda REPL server host/port.")))
 
 (defn play!
   "Converts its arguments into a string of Alda code (via [[->str]]) and sends
