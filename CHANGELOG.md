@@ -2,7 +2,62 @@
 
 ## 0.3.0 (???)
 
-* alda-clj now requires version 2.0.0 or greater.
+This release coincides with the release of Alda 2.0.0. :tada:
+
+### Breaking changes
+
+* **alda-clj now requires Alda version 2.0.0 or greater.**
+
+* The syntax for `key-signature` and friends (`key-sig`, `key-sig!`,
+  `key-signature!`) has changed slightly, corresponding to the same change in
+  Alda itself in Alda 2. See the [Alda 2 migration guide][alda-2-syntax-changed]
+  for more information about this change. To summarize:
+
+  ```clojure
+  ;; Alda 1 and 2 (still works)
+  (key-sig "f+ c+ g+")
+
+  ;; Alda 1 (no longer works in alda-clj)
+  (key-sig! [:a :major])
+  (key-sig! {:f [:sharp] :c [:sharp] :g [:sharp]})
+
+  ;; Alda 2
+  (key-sig '(a major))
+  (key-sig '(f (sharp) c (sharp) g (sharp)))
+  ```
+
+  Everything else about the syntax in Alda 2 and alda-clj remains the same.
+
+* Removed `*alda-history*` and the `clear-history` function, as they are no
+  longer relevant. See below about connecting to an Alda REPL server to preserve
+  context between evaluations.
+
+### Improvements
+
+* The `alda` function (as well as the functions that depend on it, including
+  `play!`) now prints stdout and stderr output from Alda as it is produced. The
+  stdout output is still returned at the end as a string.
+
+### New features
+
+* You can connect to an Alda REPL server (a new feature of Alda 2) via the new
+  `connect!` function. There is also a `disconnect!` if you want to undo that
+  and revert to the default, out-of-the box behavior, where `alda play` is used
+  to evaluate and play scores in a separate context.
+
+  Connecting to an Alda REPL server is recommended, as it allows you to evaluate
+  subsequent snippets of Alda code within the same context. This is great for
+  interactive development and live coding. I've updated the [Getting
+  Started][getting-started] guide with more details about this new workflow, so
+  check that out!
+
+* Added `score-text` and `new-score!` functions to display the current score
+  text and start a new score, respectively. These functions can only be used
+  when connected to an Alda REPL server.
+
+* Added a `send-nrepl-message!` function that most of you won't ever need to
+  use, but if you ever do, it's there! `send-nrepl-message!` is used internally
+  by functions like `play!` when you're connected to an Alda REPL server.
 
 * Added a `parse-events` function that takes any combination of strings of Alda
   code and alda-clj event records, runs them through `alda parse --output
@@ -86,3 +141,5 @@ Initial release. I think things are relatively stable, but report any issues you
 may run into!
 
 [wcerfgba]: https://github.com/wcerfgba
+[getting-started]: https://cljdoc.org/d/io.djy/alda-clj/CURRENT/doc/getting-started
+[alda-2-syntax-changed]: https://github.com/alda-lang/alda/blob/master/doc/alda-2-migration-guide.md#attribute-syntax-has-changed-in-some-cases
