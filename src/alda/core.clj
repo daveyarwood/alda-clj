@@ -110,7 +110,7 @@
                     {:object object, :object-type (type object)})))
   (-lisp-form object))
 
-(defn read-alda-nrepl-port-file
+(defn- read-alda-nrepl-port-file
   "If an .alda-nrepl-port file is present in the current directory, reads the
    file and returns the port number that the Alda REPL server is running on.
 
@@ -178,7 +178,7 @@
   (alter-var-root #'*alda-nrepl-server-info* (constantly nil))
   (println "Alda REPL server host/port un-set."))
 
-(defn require-connection!
+(defn- require-connection!
   []
   (when-not *alda-nrepl-server-info*
     (throw (ex-info
