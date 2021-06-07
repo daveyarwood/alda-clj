@@ -1169,11 +1169,100 @@
 
 (lisp-builtin-attributes
   tempo metric-modulation quant quantize quantization vol volume track-vol
-  track-volume pan panning key-sig key-signature transpose transposition
-  tuning-constant reference-pitch)
+  track-volume pan panning transpose transposition tuning-constant
+  reference-pitch)
 
 (lisp-builtins
-  set-duration set-note-length octave!)
+  set-duration set-note-length)
+
+(defn- lisp-quoting-workaround
+  "Because of quoting issues, I wasn't able to define attributes like `octave`
+   and `key-signature` (which take quoted arguments) via
+   `lisp-builtin-attributes`.
+
+   I'm circumventing the implementation of Stringify for Sexp here, which I'm
+   not very happy about, but hey, it works.
+
+   TODO: Adjust this to accept multiple arguments, if we ever need that."
+  [attr-name x]
+  (format "(%s %s)"
+          attr-name
+          (if (or (coll? x) (symbol? x))
+            (str "'" (pr-str x))
+            (pr-str x))))
+
+;; NOTE: `octave` is already defined separately above, because there is a
+;; dedicated syntax for (local) octave attribute changes, i.e, o3 or < or >.
+;;
+;; We need to do this hack for (global) `octave!` changes though.
+(defn octave!
+  "Emits inline Lisp code `(octave! ...)`
+
+   Example usage:
+
+   ```clojure
+   (octave! 5)
+   (octave! :up)
+   (octave! :down)
+   ```"
+  [x]
+  (lisp-quoting-workaround
+    "octave!"
+    ;; Allow both 'up / 'down and :up / :down, even though Alda 2 only accepts
+    ;; 'up / 'down.
+    (get {:up 'up, :down 'down} x x)))
+
+(defn key-signature
+  "Emits inline Lisp code `(key-signature ...)`
+
+   You can specify the key signature in a few ways:
+
+   ```clojure
+   (key-signature \"f+ c+ g+\")
+   (key-signature '(a major))
+   (key-signature '(f (sharp) c (sharp) g (sharp)))
+   ```"
+  [x]
+  (lisp-quoting-workaround "key-signature" x))
+
+(defn key-signature!
+  "Emits inline Lisp code `(key-signature! ...)`
+
+   You can specify the key signature in a few ways:
+
+   ```clojure
+   (key-signature! \"f+ c+ g+\")
+   (key-signature! '(a major))
+   (key-signature! '(f (sharp) c (sharp) g (sharp)))
+   ```"
+  [x]
+  (lisp-quoting-workaround "key-signature!" x))
+
+(defn key-sig
+  "Emits inline Lisp code `(key-sig ...)`
+
+   You can specify the key signature in a few ways:
+
+   ```clojure
+   (key-sig \"f+ c+ g+\")
+   (key-sig '(a major))
+   (key-sig '(f (sharp) c (sharp) g (sharp)))
+   ```"
+  [x]
+  (lisp-quoting-workaround "key-sig" x))
+
+(defn key-sig!
+  "Emits inline Lisp code `(key-sig! ...)`
+
+   You can specify the key sig!nature in a few ways:
+
+   ```clojure
+   (key-sig! \"f+ c+ g+\")
+   (key-sig! '(a major))
+   (key-sig! '(f (sharp) c (sharp) g (sharp)))
+   ```"
+  [x]
+  (lisp-quoting-workaround "key-sig!" x))
 
 (defn- event-duration-map->Duration
   [{:keys [components]}]
