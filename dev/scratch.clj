@@ -20,7 +20,26 @@
 
   (play!
     (part "piano")
+    (octave 2)
+    (note (pitch :c) (note-length 2))
+    (part "accordion")
+    (octave 3)
+    (note (pitch :c) (note-length 2))
+    (octave! :up)
+    (part "piano/accordion")
+    (note (pitch :c)))
+
+  (play!
+    (part "piano")
     (octave 4)
+    (chord (note (pitch :c))
+           (note (pitch :e :flat) nil :slur)
+           (note (pitch :g) (note-length 2) :slur))
+    (octave :up)
+    (chord (note (pitch :c))
+           (note (pitch :e :flat) nil :slur)
+           (note (pitch :g) (note-length 1) :slur))
+    (octave 'up)
     (chord (note (pitch :c))
            (note (pitch :e :flat) nil :slur)
            (note (pitch :g) (note-length 1) :slur)))
