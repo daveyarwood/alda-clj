@@ -662,9 +662,11 @@
 (defrecord OctaveShift [direction]
   Stringify
   (-str [{:keys [direction]}]
-    (case direction
+    (condp = direction
       :up   ">"
-      :down "<")))
+      :down "<"
+      'up   ">"
+      'down "<")))
 
 (defn octave
   "Sets the current octave, which is used to calculate the pitch of notes.
@@ -712,7 +714,7 @@
     (number? value)
     (map->OctaveSet {:octave-number value})
 
-    (#{:up :down} value)
+    (#{:up :down 'up 'down} value)
     (map->OctaveShift {:direction value})
 
     :else
