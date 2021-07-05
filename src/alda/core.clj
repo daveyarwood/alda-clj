@@ -40,7 +40,7 @@
 
    ```clojure
    (alda \"version\")
-   ;;=> \"alda 1.99.4\\n\"
+   ;;=> \"alda 2.0.0\\n\"
 
    (alda \"parse\" \"-c\" \"bassoon: o3 c\")
    ;;=> \"{\\\"aliases\\\":{},\\\"current-parts\\\":[\\\"0xc0002509c0\\\"],...\"
