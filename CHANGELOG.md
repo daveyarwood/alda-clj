@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.3.2 (2021-07-24)
+
+(No changes to the library itself.)
+
+Fixed another pom.xml-related issue that was preventing cljdoc from generating
+the online docs.
+
 ## 0.3.1 (2021-07-24)
 
 Fixed a build issue where the deployed version of alda-clj 0.3.0 wasn't

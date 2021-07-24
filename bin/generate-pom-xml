@@ -15,8 +15,15 @@ clojure -M:garamond --group-id "io.djy" --pom
 #
 # 2. Garamond doesn't seem to have support for generating the <description> tag,
 #    so I'm adding it in manually here (in an admittedly hacky way).
+#
+# 3. cljdoc doesn't like the SCM info that Garamond generates, so I adjust it
+#    according to this:
+#    https://github.com/cljdoc/cljdoc/blob/master/doc/userguide/faq.md#how-do-i-set-scm-info-for-my-project
 description="a Clojure library for live-coding music with Alda"
 sed -i \
+  -E \
   -e '/^ *$/d' \
   -e "\|<name>|a \  <description>$description</description>"\
+  -e 's|(<connection>.*)https://|\1git://|' \
+  -e 's|(<developerConnection>.*)https://|\1ssh://git@|' \
   pom.xml
