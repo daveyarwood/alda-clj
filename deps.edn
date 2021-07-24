@@ -10,7 +10,7 @@
   {:extra-deps
    {pack/pack.alpha
     {:git/url "https://github.com/juxt/pack.alpha.git"
-     :sha "c70740ffc10805f34836da2160fa1899601fac02"}}
+     :sha     "b093f79420fef019faf62a75b888b5e10f4e8cc9"}}
 
    :main-opts
    ["-m"]}
