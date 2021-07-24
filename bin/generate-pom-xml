@@ -26,5 +26,5 @@ sed -i \
   -e "\|<name>|a \  <description>$description</description>"\
   -e 's|(<connection>.*)https://|\1git://|' \
   -e 's|(<developerConnection>.*)https://|\1ssh://git@|' \
-  -e 's|<url/>|<url>https://github.com/daveyarwood/alda-clj</url>|'
+  -e 's|<url/>|<url>https://github.com/daveyarwood/alda-clj</url>|' \
   pom.xml
