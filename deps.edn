@@ -1,13 +1,23 @@
-{:paths   ["src"]
- :deps    {me.raynes/conch  {:mvn/version "0.8.0"}
-           metosin/jsonista {:mvn/version "0.3.1"}}
- :aliases {:pack
-           {:extra-deps {pack/pack.alpha
-                         {:git/url "https://github.com/juxt/pack.alpha.git"
-                          :sha "c70740ffc10805f34836da2160fa1899601fac02"}}
-            :main-opts  ["-m"]}
+{:paths
+ ["src"]
 
-           :deploy
-           {:extra-deps {deps-deploy/deps-deploy {:mvn/version "RELEASE"}}
-            :main-opts  ["-m" "deps-deploy.deps-deploy"
-                         "deploy" "alda-clj.jar"]}}}
+ :deps
+ {me.raynes/conch  {:mvn/version "0.8.0"}
+  metosin/jsonista {:mvn/version "0.3.1"}}
+
+ :aliases
+ {:pack
+  {:extra-deps
+   {pack/pack.alpha
+    {:git/url "https://github.com/juxt/pack.alpha.git"
+     :sha "c70740ffc10805f34836da2160fa1899601fac02"}}
+
+   :main-opts
+   ["-m"]}
+
+  :deploy
+  {:extra-deps
+   {deps-deploy/deps-deploy {:mvn/version "RELEASE"}}
+
+   :main-opts
+   ["-m" "deps-deploy.deps-deploy" "deploy" "alda-clj.jar"]}}}
