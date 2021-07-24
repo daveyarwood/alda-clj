@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.3.0 (???)
+## 0.3.0 (2021-06-30)
 
 This release coincides with the release of Alda 2.0.0. :tada:
 
