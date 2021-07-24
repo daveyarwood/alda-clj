@@ -8,7 +8,7 @@
 # ANY CHANGES SHOULD BE TESTED WITH EXTRA CARE
 
 cljdoc_edn_path="$1"
-list=$(cat "$cljdoc_edn_path" |  grep ':file' | awk -F ':file' '{print $2}' | awk -F '"' '{print $2}')
+list=$(grep ':file' "$cljdoc_edn_path"  | awk -F ':file' '{print $2}' | awk -F '"' '{print $2}')
 fail=0
 
 while read -r line; do
