@@ -6,7 +6,13 @@
   metosin/jsonista {:mvn/version "0.3.1"}}
 
  :aliases
- {:pack
+ {:garamond
+  {:extra-deps
+   {com.workframe/garamond {:mvn/version "0.4.0"}}
+
+   :main-opts ["-m" "garamond.main"]}
+
+  :pack
   {:extra-deps
    {pack/pack.alpha
     {:git/url "https://github.com/juxt/pack.alpha.git"

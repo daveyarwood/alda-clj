@@ -8,24 +8,24 @@
   <description>a Clojure library for live-coding music with Alda</description>
   <dependencies>
     <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>clojure</artifactId>
-      <version>1.9.0</version>
+      <groupId>me.raynes</groupId>
+      <artifactId>conch</artifactId>
+      <version>0.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>metosin</groupId>
+      <artifactId>jsonista</artifactId>
+      <version>0.3.1</version>
     </dependency>
   </dependencies>
   <build>
     <sourceDirectory>src</sourceDirectory>
   </build>
-  <repositories>
-    <repository>
-      <id>clojars</id>
-      <url>https://clojars.org/repo</url>
-    </repository>
-  </repositories>
+  <repositories/>
   <scm>
-    <connection>scm:git:git://github.com/daveyarwood/alda-clj.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/daveyarwood/alda-clj.git</developerConnection>
-    <tag>master</tag>
-    <url>https://github.com/daveyarwood/alda-clj</url>
+    <url/>
+    <tag>bc6f85ecba210ee626fea033e8eda559087bb8ae</tag>
+    <connection>scm:git:https://github.com/daveyarwood/alda-clj.git</connection>
+    <developerConnection>scm:git:https://github.com/daveyarwood/alda-clj.git</developerConnection>
   </scm>
 </project>

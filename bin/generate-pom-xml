@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+cd "$(dirname "$0")/../"
+
+echo "Generating pom.xml..."
+rm -f pom.xml
+clojure -M:garamond --group-id "io.djy" --pom
+
+# Here, we do some postprocessing to improve the output of Garamond:
+#
+# 1. For some reason, Garamond intersperses a bunch of empty (whitespace-only)
+#    lines into my pom.xml. This command removes them.
+#
+# 2. Garamond doesn't seem to have support for generating the <description> tag,
+#    so I'm adding it in manually here (in an admittedly hacky way).
+description="a Clojure library for live-coding music with Alda"
+sed -i \
+  -e '/^ *$/d' \
+  -e "\|<name>|a \  <description>$description</description>"\
+  pom.xml

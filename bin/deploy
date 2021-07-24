@@ -6,4 +6,6 @@ cd "$(dirname "$0")/../"
 
 bin/verify-cljdoc-edn doc/cljdoc.edn
 
+bin/generate-pom-xml
+
 clojure -M:deploy
