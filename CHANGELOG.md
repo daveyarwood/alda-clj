@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.3.3 (2021-07-24)
+
+(No changes to the library itself.)
+
+Fixed another pom.xml-related issue that was preventing cljdoc from generating
+the online docs.
+
 ## 0.3.2 (2021-07-24)
 
 (No changes to the library itself.)
