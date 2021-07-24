@@ -29,8 +29,8 @@ use alda-clj:
    ```
    $ clj -Sdeps '{:deps {io.djy/alda-clj {:mvn/version "LATEST"}}}'
    Downloading: io/djy/alda-clj/maven-metadata.xml from https://repo.clojars.org/
-   Downloading: io/djy/alda-clj/0.3.0/alda-clj-0.3.0.pom from https://repo.clojars.org/
-   Downloading: io/djy/alda-clj/0.3.0/alda-clj-0.3.0.jar from https://repo.clojars.org/
+   Downloading: io/djy/alda-clj/0.3.1/alda-clj-0.3.1.pom from https://repo.clojars.org/
+   Downloading: io/djy/alda-clj/0.3.1/alda-clj-0.3.1.jar from https://repo.clojars.org/
    Clojure 1.10.1
    user=> (require '[alda.core :refer :all])
    nil

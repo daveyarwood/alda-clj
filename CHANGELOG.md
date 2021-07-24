@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.3.1 (2021-07-24)
+
+Fixed a build issue where the deployed version of alda-clj 0.3.0 wasn't
+including the right dependencies because of a stale pom.xml.
+
+I am now generating the pom.xml every time before deploying to Clojars, so this
+issue hopefully won't happen again!
+
 ## 0.3.0 (2021-06-30)
 
 This release coincides with the release of Alda 2.0.0. :tada:
