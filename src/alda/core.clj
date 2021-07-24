@@ -1,7 +1,7 @@
 (ns alda.core
-  (:require [alda.shell         :as sh]
-            [clojure.string     :as str]
-            [jsonista.core      :as json])
+  (:require [alda.shell     :as sh]
+            [clojure.string :as str]
+            [jsonista.core  :as json])
   (:import [java.io File]
            [java.nio.file Paths]))
 
