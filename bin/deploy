@@ -1,7 +1,9 @@
 #!/bin/bash
 
-cd "$(dirname "$0")/../" || exit 1
+set -eo pipefail
 
-bin/verify-cljdoc-edn doc/cljdoc.edn || exit 1
+cd "$(dirname "$0")/../"
+
+bin/verify-cljdoc-edn doc/cljdoc.edn
 
 clojure -A:deploy
