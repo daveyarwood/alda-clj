@@ -1,8 +1,7 @@
 #!/bin/bash
 
-script_dir="$(dirname "$0")"
-doc="$script_dir/../doc"
+cd "$(dirname "$0")/../" || exit 1
 
-"$script_dir/verify-cljdoc-edn" "$doc/cljdoc.edn" || exit 1
+bin/verify-cljdoc-edn doc/cljdoc.edn || exit 1
 
 clojure -A:deploy

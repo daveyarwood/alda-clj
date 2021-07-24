@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")/../" || exit 1
+
 echo "Building alda-clj.jar..."
 
 rm -f alda-clj.jar
