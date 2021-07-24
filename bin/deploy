@@ -6,4 +6,4 @@ cd "$(dirname "$0")/../"
 
 bin/verify-cljdoc-edn doc/cljdoc.edn
 
-clojure -A:deploy
+clojure -M:deploy

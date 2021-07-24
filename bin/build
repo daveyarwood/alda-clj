@@ -8,7 +8,7 @@ echo "Building alda-clj.jar..."
 
 rm -f alda-clj.jar
 
-clojure -A:pack \
+clojure -M:pack \
   mach.pack.alpha.skinny \
   --no-libs \
   --project-path alda-clj.jar
