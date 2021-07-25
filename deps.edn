@@ -11,7 +11,7 @@
    {clj-kondo/clj-kondo
     {:git/url "https://github.com/clj-kondo/clj-kondo"
      ;; see https://github.com/clj-kondo/clj-kondo/commits/macroexpand for newer commits
-     :sha "d779b794a6ebb631954a8399e2a7136f72f75365"}}
+     :sha "32ae3b831efe676b5e89b0b4bbaf70de223e8109"}}
    :main-opts ["-m" "clj-kondo.main"]}
 
   :garamond
