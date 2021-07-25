@@ -35,14 +35,14 @@
 (defn transform-lisp-builtin
   ""
   [{:keys [node]}]
-  {:node (doto (api/macroexpand lisp-builtin node) prn)})
+  {:node (api/macroexpand lisp-builtin node)})
 
 (defn transform-lisp-builtins
   ""
   [{:keys [node]}]
-  {:node (doto (api/macroexpand lisp-builtins node) prn)})
+  {:node (api/macroexpand lisp-builtins node)})
 
 (defn transform-lisp-builtin-attributes
   ""
   [{:keys [node]}]
-  {:node (doto (api/macroexpand lisp-builtin-attributes node) prn)})
+  {:node (api/macroexpand lisp-builtin-attributes node)})
