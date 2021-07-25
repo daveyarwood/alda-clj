@@ -4,6 +4,6 @@
 
  :hooks
  {:analyze-call
-  {alda.core/lisp-builtin            hooks/lisp-builtin
-   alda.core/lisp-builtins           hooks/lisp-builtins
-   alda.core/lisp-builtin-attributes hooks/lisp-builtin-attributes}}}
+  {alda.core/lisp-builtin            hooks/lisp-builtin2
+   alda.core/lisp-builtins           hooks/lisp-builtins2
+   alda.core/lisp-builtin-attributes hooks/lisp-builtin-attributes2}}}

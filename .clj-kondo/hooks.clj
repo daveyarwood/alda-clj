@@ -109,3 +109,42 @@
                [(api/token-node 'alda.core/lisp-builtins)
                 (api/token-node sym)
                 (api/token-node (symbol (str sym "!")))]))))})))
+
+(defmacro ^:private lisp-builtin-impl
+  [sym]
+  `(defn ~sym
+     ~(format "Emits inline Lisp code `(%s ...)`" sym)
+     [& ~'args]
+     ;; These don't seem to work, but it doesn't really matter that this macro
+     ;; returns _exactly_ what the real one in alda.core does; the important
+     ;; thing is just that we `def` something.
+     ;; (map->Sexp {:form (list* '~sym ~'args)})
+     ;; (alda.core/map->Sexp {:form (list* '~sym ~'args)})
+     ;;
+     ;; ...These don't seem to work either, though:
+     ;; {:form (list* '~sym ~'args)}))
+     "placeholder value"))
+
+(defmacro ^:private lisp-builtins-impl
+  [& syms]
+  (cons 'do
+        (for [sym syms]
+          `(lisp-builtin ~sym))))
+
+(defmacro ^:private lisp-builtin-attributes-impl
+  [& syms]
+  (cons 'do
+        (for [sym syms]
+          `(lisp-builtins ~sym ~(symbol (str sym \!))))))
+
+(defn lisp-builtin2
+  [{:keys [node]}]
+  {:node (api/macroexpand lisp-builtin-impl node)})
+
+(defn lisp-builtins2
+  [{:keys [node]}]
+  {:node (api/macroexpand lisp-builtins-impl node)})
+
+(defn lisp-builtin-attributes2
+  [{:keys [node]}]
+  {:node (api/macroexpand lisp-builtin-attributes-impl node)})
