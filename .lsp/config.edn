@@ -1,0 +1,4 @@
+{:linters
+ {:unused-public-var
+  {:level   :warning
+   :exclude #{alda.core hooks}}}}

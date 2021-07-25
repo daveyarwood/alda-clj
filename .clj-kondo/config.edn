@@ -1,0 +1,9 @@
+{:linters
+ {:missing-docstring            {:level :warning}
+  :unsorted-required-namespaces {:level :warning}}
+
+ :hooks
+ {:analyze-call
+  {alda.core/lisp-builtin            hooks/lisp-builtin
+   alda.core/lisp-builtins           hooks/lisp-builtins
+   alda.core/lisp-builtin-attributes hooks/lisp-builtin-attributes}}}

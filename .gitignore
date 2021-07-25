@@ -2,6 +2,5 @@
 .nrepl*
 .alda-nrepl*
 .socket-port
-.lsp/
 alda-clj.jar
 pom.xml
