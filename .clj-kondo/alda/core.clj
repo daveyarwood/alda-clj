@@ -22,19 +22,15 @@
 
 (defmacro ^:private lisp-builtins
   [& syms]
-  (if (> (count syms) 1)
-    (cons 'do
-          (for [sym syms]
-            `(lisp-builtin ~sym)))
-    `(lisp-builtin ~(first syms))))
+  (cons 'do
+        (for [sym syms]
+          `(lisp-builtin ~sym))))
 
 (defmacro ^:private lisp-builtin-attributes
   [& syms]
-  (if (> (count syms) 1)
-    (cons 'do
-          (for [sym syms]
-            `(lisp-builtins ~sym ~(symbol (str sym \!)))))
-    `(lisp-builtins ~(first syms) ~(symbol (str ~(first syms) \!)))))
+  (cons 'do
+        (for [sym syms]
+          `(lisp-builtins ~sym ~(symbol (str sym \!))))))
 
 (defn transform-lisp-builtin
   ""
