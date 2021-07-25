@@ -126,7 +126,9 @@
     (when (.isFile (File. port-file-path))
       (Integer/parseInt (slurp port-file-path)))))
 
-(def ^:dynamic *alda-nrepl-server-info* nil)
+(def ^{:dynamic true, :private true}
+  *alda-nrepl-server-info*
+  nil)
 
 (defn connect!
   "Sets the host and port number used internally by alda-clj to send messages to
@@ -1272,9 +1274,10 @@
                                      (note-length denominator dots))
                                    components)}))
 
-(defmulti event-map->record (fn [event-map]
-                              (select-keys event-map [:type
-                                                      :attribute])))
+(defmulti ^:private event-map->record
+  (fn [event-map]
+    (select-keys event-map [:type
+                            :attribute])))
 
 (defmethod event-map->record :default
   [event-map]
