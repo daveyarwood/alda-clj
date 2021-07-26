@@ -19,18 +19,3 @@
   (cons 'do
         (for [sym syms]
           `(lisp-builtins ~sym ~(symbol (str sym \!))))))
-
-(defn transform-lisp-builtin
-  ""
-  [{:keys [node]}]
-  {:node (api/macroexpand lisp-builtin node)})
-
-(defn transform-lisp-builtins
-  ""
-  [{:keys [node]}]
-  {:node (api/macroexpand lisp-builtins node)})
-
-(defn transform-lisp-builtin-attributes
-  ""
-  [{:keys [node]}]
-  {:node (api/macroexpand lisp-builtin-attributes node)})

@@ -3,7 +3,7 @@
   :unsorted-required-namespaces {:level :warning}}
 
  :hooks
- {:analyze-call
-  {alda.core/lisp-builtin            alda.core/transform-lisp-builtin
-   alda.core/lisp-builtins           alda.core/transform-lisp-builtins
-   alda.core/lisp-builtin-attributes alda.core/transform-lisp-builtin-attributes}}}
+ {:macroexpand
+  {alda.core/lisp-builtin            alda.core/lisp-builtin
+   alda.core/lisp-builtins           alda.core/lisp-builtins
+   alda.core/lisp-builtin-attributes alda.core/lisp-builtin-attributes}}}
