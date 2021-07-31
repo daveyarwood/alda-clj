@@ -6,15 +6,7 @@
   metosin/jsonista {:mvn/version "0.3.1"}}
 
  :aliases
- {:clj-kondo
-  {:replace-deps
-   {clj-kondo/clj-kondo
-    {:git/url "https://github.com/clj-kondo/clj-kondo"
-     ;; see https://github.com/clj-kondo/clj-kondo/commits/macroexpand for newer commits
-     :sha "8b5cf40d1cf92409687f2697b29220435f8cc137"}}
-   :main-opts ["-m" "clj-kondo.main"]}
-
-  :garamond
+ {:garamond
   {:extra-deps
    {com.workframe/garamond {:mvn/version "0.4.0"}}
 
