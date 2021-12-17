@@ -1,5 +1,4 @@
-(ns alda.core
-  (:require [clj-kondo.hooks-api :as api]))
+(ns alda.core)
 
 (defmacro ^:private lisp-builtin
   [sym]
