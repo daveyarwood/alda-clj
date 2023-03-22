@@ -4,3 +4,4 @@
 .socket-port
 alda-clj.jar
 pom.xml
+.lsp/.cache/
